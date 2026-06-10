@@ -32,6 +32,14 @@ def gget(name):
     return r.iloc[0] if len(r) else None
 g_nitro = gget("Nitrospira_D"); g_brady = gget("Bradyrhizobium"); g_methylo = gget("Methyloceanibacter")
 
+# species-level summary (uncultured fraction + strain-level Nitrospira)
+unc = {}
+for line in open(f"{RES}/uncultured_fraction.txt"):
+    k, v = line.strip().split("\t"); unc[k] = v
+spd = pd.read_csv(f"{RES}/species_drought.tsv", sep="\t")
+spd = spd[~spd.species.str.startswith("t__")]
+sp_nitro = spd[spd.species.str.startswith("Nitrospira_D sp")].iloc[0]
+
 def shift_table(df):
     rows = ""
     for _, r in df.head(8).iterrows():
@@ -118,6 +126,22 @@ uninterpretable GTDB placeholder codes (e.g. <code>DATFRX01</code>), and the
 Actinomycetota phylum increase does not resolve to any single genus — it is spread thinly
 across many. Genus level adds functional specificity for the nitrogen-cyclers but is
 noisier overall, so the robust headline stays at phylum.</div>
+
+<h3>2c. Species level: a strain-specific signal in a largely uncultured community</h3>
+<p>Two things stand out at species/strain resolution. First, this is a
+<b>predominantly uncultured community</b>: on average <b>{float(unc['mean_uncultured_pct']):.0f}%</b>
+of classified abundance (range {float(unc['min']):.0f}–{float(unc['max']):.0f}%) belongs to
+GTDB lineages with no cultured representative — placeholder-coded single-cell and
+metagenome-assembled genomes (e.g. the most abundant single "species", at ~17%, is an
+uncultured organism, <code>SCGC-AG-212-J23</code>). This fits a long-enclosed artificial
+ecosystem harbouring novel soil taxa.</p>
+<p>Second, the nitrogen-cycle signal sharpens to a <b>single strain</b>: the
+nitrite-oxidiser decline tracks one dominant <i>Nitrospira</i> genome
+(<code>GCA_029194675.1</code>), down {sp_nitro['pre']:.2f}→{sp_nitro['drought']:.2f}%
+(<b>p={sp_nitro['p']:.3f}</b>). Critically, the same decline is significant at
+<b>every taxonomic rank</b> — phylum → genus → strain — which makes drought-suppressed
+nitrification the most defensible result in the dataset.</p>
+<div class="fig">{img('09_nitrospira_ranks.png')}</div>
 
 <h2>3. Diversity and community structure are resilient</h2>
 <p>Genus-level Shannon diversity does not differ between conditions
