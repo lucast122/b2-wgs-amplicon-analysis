@@ -1,0 +1,4 @@
+OK	network_metrics.tsv
+OK	fig11 written
+OK	perm p in (0,1]
+OK	both nets built

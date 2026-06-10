@@ -83,24 +83,27 @@ _aitp = ait.get('PERMANOVA_Aitchison_p', '—')
 _clrq = f"{clr_nit['q_BH']:.2f}" if clr_nit is not None else "—"
 _pcp  = f"{pc_nit['MWU_p_plot']:.2f}" if pc_nit is not None else "—"
 _pwrd = pwr.get('min_detectable_Cohens_d_80pct', '—')
+_netp = "—"
+if os.path.exists(f"{RES}/network_metrics.tsv"):
+    for _l in open(f"{RES}/network_metrics.tsv"):
+        if _l.startswith("# edge_diff_perm_p"): _netp = _l.strip().split("\t")[1]
 robustness_html = f"""
-<h3>3b. Robustness — the signal does not survive compositional or design-aware correction</h3>
-<p>Relative abundances are compositional and the three timepoints are repeated measures of the
-same plots, so we re-tested the drought contrast with methods that control for both
-(see <a href="methods.html">methods §5.2–5.3</a>). The headline does not strengthen — it weakens:</p>
-<table><tr><th>Test (what it controls for)</th><th>Result for the pre-vs-drought contrast</th></tr>
-<tr><td>Aitchison/CLR PCoA — PERMANOVA (compositionality)</td><td>p={_aitp} — no community structure</td></tr>
-<tr><td>CLR Welch + BH-FDR (compositionality)</td><td><i>Nitrospira</i> is the top hit but q={_clrq} — n.s.</td></tr>
-<tr><td>Dirichlet-multinomial <i>t</i>-test (compositionality)</td><td><b>{n_dmt if n_dmt is not None else '—'}</b> genera significant</td></tr>
-<tr><td>Dirichlet-multinomial mixed model, <b>plot random effect</b> (pseudoreplication)</td><td><b>{n_lme if n_lme is not None else '—'}</b> genera significant</td></tr>
-<tr><td>Plot-collapsed Mann–Whitney (pseudoreplication)</td><td><i>Nitrospira</i> p={_pcp}</td></tr></table>
-<div class="caveat"><b>Honest bottom line:</b> under compositionally-correct and plot-aware
-analysis, <b>no taxon shows a statistically significant drought shift</b>, and the design is
-underpowered (n=17 vs 19; smallest effect detectable at 80% power is Cohen's d&asymp;{_pwrd}).
-The <i>Nitrospira</i>/nitrification pattern remains the strongest and most internally
-consistent observation in the data — largest effect size, same direction at every taxonomic
-rank, and directionally reproduced in the 328-sample 16S survey — but it is most defensibly
-reported as a <b>hypothesis for a powered, paired follow-up</b>, not an established effect.</div>
+<h3>3b. Robustness, power, and a sampling caveat</h3>
+<p>Abundances are compositional and timepoints are repeated measures of the same plots, so the
+drought contrast was re-tested with methods controlling for both
+(<a href="methods.html">methods §5.2–5.4</a>). It does not strengthen:</p>
+<table><tr><th>Test (controls for)</th><th>Drought contrast</th></tr>
+<tr><td>Aitchison/CLR PERMANOVA (compositionality)</td><td>p={_aitp}, n.s.</td></tr>
+<tr><td>CLR Welch+FDR / Dirichlet-multinomial <i>t</i>-test (compositionality)</td><td><i>Nitrospira</i> top hit q={_clrq}; {n_dmt if n_dmt is not None else '—'} genera signif.</td></tr>
+<tr><td>Mixed model, plot random effect (pseudoreplication)</td><td>{n_lme if n_lme is not None else '—'} genera signif.</td></tr>
+<tr><td>Plot-collapsed Mann–Whitney (pseudoreplication)</td><td><i>Nitrospira</i> p={_pcp}</td></tr>
+<tr><td>Genus co-occurrence networks (structure)</td><td>no connectance shift, perm p={_netp}</td></tr></table>
+<div class="caveat"><b>Bottom line:</b> under compositional- and plot-aware analysis <b>no taxon
+is significant</b>, and the design is underpowered (n=17 vs 19; min detectable d&asymp;{_pwrd}).
+<b>Sampling confound:</b> pre-drought (Sept) and drought (Nov) samples are temporally separated
+and the one contemporaneous control plot is unusable in WGS (2/3 dropped at QC), so drought
+cannot be cleanly separated from season. <i>Nitrospira</i> is the strongest, most consistent
+signal but is best treated as a hypothesis for a powered, season-controlled follow-up.</div>
 """ if T1 else ""
 
 html = f"""<!doctype html><html><head><meta charset="utf-8">
@@ -128,17 +131,14 @@ Shotgun profiling with sylph (GTDB r232 + FungiRefSeq + custom AMF database);
 <p style="margin-top:-4px"><a href="methods.html"><b>📋 Read the detailed methods &rarr;</b></a>
 <span class="muted">(separate page — samples, databases, the Kaiju build, and full statistics)</span></p>
 
-<div class="key"><b>Headline:</b> At this sample size (n={stats.get('n_samples','36')}) the bulk
-soil bacterial/archaeal community shows <b>no drought shift detectable</b> in overall
-diversity or community structure, and <b>no individual taxon survives multiple-testing
-correction</b>. Against that backdrop one signal stands out by <i>converging evidence</i>
-rather than a single p-value: a suppression of <b>nitrite-oxidising <i>Nitrospira</i></b>
-that is directionally consistent from phylum → genus → strain, carries a <b>large</b> effect
-size at genus level (Cliff's δ≈−0.63), and reproduces in an independent 328-sample 16S
-survey; alongside it the drought-tolerant <b>Actinomycetota increase</b> (medium effect,
-also seen in 16S). This fits the manuscript's picture of drought adaptation via subtle
-carbon/nitrogen-allocation shifts rather than wholesale community turnover — but is framed
-here as a <i>well-supported hypothesis</i>, not a significant result.</div>
+<div class="key"><b>Headline:</b> At n={stats.get('n_samples','36')}, no taxon survives
+multiple-testing correction and overall diversity/structure is unchanged — <b>no
+statistically significant drought shift</b>. The strongest pattern, by converging evidence
+rather than any single p-value, is suppression of nitrite-oxidising <b><i>Nitrospira</i></b>
+(large effect, consistent phylum→genus→strain, echoed in the 328-sample 16S survey), with a
+drought-tolerant <b>Actinomycetota</b> rise. We report these as <i>hypotheses</i>, not
+established effects. <b>Key caveat:</b> pre-drought samples are from September and drought
+from November, so condition is confounded with sampling date/season (§3b).</div>
 
 <h2>1. Community composition</h2>
 <p>The soil is bacteria-dominated (~95%), with a substantial ammonia-oxidising archaeal
@@ -158,12 +158,10 @@ to {shift.loc[shift.phylum=='Actinomycetota','drought_mean'].values[0]:.1f}%
 <i>Nitrospirota</i> fall from {shift.loc[shift.phylum=='Nitrospirota','pre_mean'].values[0]:.1f}%
 to {shift.loc[shift.phylum=='Nitrospirota','drought_mean'].values[0]:.1f}%
 (p={shift.loc[shift.phylum=='Nitrospirota','MWU_p'].values[0]:.3f}, medium effect).</p>
-<div class="caveat"><b>After multiple-testing correction (Benjamini–Hochberg over
-{len(shift)} phyla), no phylum survives at q&lt;0.05</b> (both q≈{shift.loc[shift.phylum=='Nitrospirota','q_BH'].values[0]:.2f}).
-The phylum table is therefore <i>suggestive, not significant</i> on its own. What makes the
-N-cycling signal credible is not the phylum p-value but its <b>consistency across ranks
-(phylum→genus→strain), its large effect size at genus level, and its reproduction in an
-independent 16S survey</b> (below) — convergent lines of evidence rather than a single test.</div>
+<div class="caveat"><b>No phylum survives BH-FDR correction</b>
+(q≈{shift.loc[shift.phylum=='Nitrospirota','q_BH'].values[0]:.2f}). The phylum table is
+suggestive only; the N-cycling signal rests on cross-rank and cross-assay consistency
+(below), not these p-values.</div>
 <div class="key"><b>Why this matters:</b> Actinomycetota are textbook drought-tolerant soil
 bacteria (thick peptidoglycan walls, sporulation, osmolyte accumulation). Their relative
 increase is an independent confirmation that the drought treatment imposed real water

@@ -145,8 +145,10 @@ large uncultured fraction of this enclosed ecosystem. Recovered genomes are scre
 stress pathways; strain dynamics of the dominant <i>Nitrospira</i> are assessed with inStrain
 (popANI/SNV), and Actinomycetota biosynthetic gene clusters with antiSMASH.</p>
 <h3>6.3 Ecological networks and viruses</h3>
-<p>Per-condition co-occurrence networks (FlashWeave) compare connectivity/modularity as a
-network-level convergence test; viral contigs are identified with geNomad.</p>
+<p>Per-condition genus co-occurrence networks (Spearman on CLR-transformed prevalent genera;
+edges at |ρ|≥0.6 and BH-FDR q&lt;0.05; connectance compared by label permutation) test
+network-level convergence. Viral contigs via geNomad; MAGs via MEGAHIT → MetaBAT2 → CheckM2 →
+GTDB-Tk (databases staged locally under <code>ebt-metagenomics/resources</code>).</p>
 
 <h2>7. Reproducibility</h2>
 <p>Profiling/QC in dedicated conda environments; statistics in Python 3.12 with scikit-bio,
