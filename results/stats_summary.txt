@@ -3,9 +3,13 @@ shannon_pre	2.8193
 shannon_drought	2.6707
 shannon_MWU_p	0.2674
 PERMANOVA_F	1.0967
-PERMANOVA_p	0.318
+PERMANOVA_p	0.331
 PERMDISP_F	0.3499
-PERMDISP_p	0.537
+PERMDISP_p	0.548
 withinBC_pre	0.3544
 withinBC_drought	0.3862
 convergence_MWU_p	0.9733
+betweenSiteBC_pre	0.3691
+betweenSiteBC_drought	0.3903
+betweenSite_conv_MWU_p	0.8672
+pcoa_negative_eigen_pct	-0.00

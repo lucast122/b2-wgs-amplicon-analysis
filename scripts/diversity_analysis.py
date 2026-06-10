@@ -80,15 +80,70 @@ pc = ord_res.samples.iloc[:, :2].copy()
 pc.columns = [0, 1]; pc.index = samples
 ve = ord_res.proportion_explained[:2].values * 100
 
-fig, ax = plt.subplots(figsize=(5, 4.4))
+# color = condition, marker shape = timepoint, so samples are separable by both
+from matplotlib.lines import Line2D
+tp_order = ["0h", "6h", "48h"]
+tp_markers = {"0h": "o", "6h": "^", "48h": "s"}
+md["timepoint"] = md["timepoint"].astype(str)
+fig, ax = plt.subplots(figsize=(5.6, 4.6))
 for c in ["pre-drought", "drought"]:
-    idx = [s for s in samples if md.loc[s, "condition"] == c]
-    ax.scatter(pc.loc[idx, 0], pc.loc[idx, 1], color=pal[c], label=c, alpha=.8, s=45,
-               edgecolor="k", linewidth=.4)
+    for tp in tp_order:
+        idx = [s for s in samples if md.loc[s, "condition"] == c and md.loc[s, "timepoint"] == tp]
+        if not idx:
+            continue
+        ax.scatter(pc.loc[idx, 0], pc.loc[idx, 1], color=pal[c], marker=tp_markers[tp],
+                   alpha=.85, s=50, edgecolor="k", linewidth=.4)
 ax.set_xlabel(f"PCo1 ({ve[0]:.1f}%)"); ax.set_ylabel(f"PCo2 ({ve[1]:.1f}%)")
 ax.set_title(f"Bray-Curtis PCoA\nPERMANOVA p={pn['p-value']:.3g} | PERMDISP p={pd_disp['p-value']:.3g}")
-ax.legend(frameon=False)
+# dual legend: color -> condition, shape -> timepoint
+cond_h = [Line2D([0],[0], marker='o', color='w', markerfacecolor=pal[c], markeredgecolor='k',
+                 markersize=8, label=c) for c in ["pre-drought","drought"]]
+tp_h = [Line2D([0],[0], marker=tp_markers[tp], color='w', markerfacecolor='gray', markeredgecolor='k',
+               markersize=8, label=tp) for tp in tp_order]
+leg1 = ax.legend(handles=cond_h, title="condition", frameon=False, loc="best", fontsize=8, title_fontsize=8)
+ax.add_artist(leg1)
+ax.legend(handles=tp_h, title="timepoint", frameon=False, loc="lower right", fontsize=8, title_fontsize=8)
 plt.tight_layout(); plt.savefig(f"{FIG}/02_pcoa_braycurtis.png", dpi=130); plt.close()
+
+# Bray-Curtis is a semimetric -> PCoA yields negative eigenvalues; report their weight
+ev_all = ord_res.proportion_explained.values
+neg_frac = float(-ev_all[ev_all < 0].sum() / np.abs(ev_all).sum()) * 100
+
+# ---- 2b. Site-encoded PCoA (tests the site-to-site convergence hypothesis) --
+site_pal = {"Site1": "#2ca02c", "Site2": "#9467bd", "CTRL": "#7f7f7f"}
+cond_marker = {"pre-drought": "o", "drought": "^"}
+md["site"] = md["site"].astype(str)
+fig, ax = plt.subplots(figsize=(5.6, 4.6))
+for st in [s for s in ["Site1", "Site2", "CTRL"] if s in md["site"].unique()]:
+    for c in ["pre-drought", "drought"]:
+        idx = [s for s in samples if md.loc[s, "site"] == st and md.loc[s, "condition"] == c]
+        if not idx: continue
+        ax.scatter(pc.loc[idx, 0], pc.loc[idx, 1], color=site_pal.get(st, "#333"),
+                   marker=cond_marker[c], alpha=.85, s=50, edgecolor="k", linewidth=.4)
+ax.set_xlabel(f"PCo1 ({ve[0]:.1f}%)"); ax.set_ylabel(f"PCo2 ({ve[1]:.1f}%)")
+ax.set_title("Bray-Curtis PCoA by site")
+site_h = [Line2D([0],[0], marker='s', color='w', markerfacecolor=site_pal[s], markeredgecolor='k',
+                 markersize=8, label=s) for s in ["Site1","Site2","CTRL"] if s in md["site"].unique()]
+cm_h = [Line2D([0],[0], marker=cond_marker[c], color='w', markerfacecolor='gray', markeredgecolor='k',
+               markersize=8, label=c) for c in ["pre-drought","drought"]]
+leg1 = ax.legend(handles=site_h, title="site", frameon=False, loc="best", fontsize=8, title_fontsize=8)
+ax.add_artist(leg1)
+ax.legend(handles=cm_h, title="condition", frameon=False, loc="lower right", fontsize=8, title_fontsize=8)
+plt.tight_layout(); plt.savefig(f"{FIG}/02b_pcoa_site.png", dpi=130); plt.close()
+
+# proper convergence test: BETWEEN-site (Site1 vs Site2) BC distance, pre vs drought
+def between_site_dist(cond):
+    s1 = [s for s in samples if md.loc[s,"site"]=="Site1" and md.loc[s,"condition"]==cond]
+    s2 = [s for s in samples if md.loc[s,"site"]=="Site2" and md.loc[s,"condition"]==cond]
+    if not s1 or not s2: return np.array([])
+    sub = dm.filter(s1+s2).data; n1 = len(s1)
+    return sub[:n1, n1:].ravel()   # all Site1 x Site2 pairs
+bs_pre = between_site_dist("pre-drought"); bs_dro = between_site_dist("drought")
+if len(bs_pre) and len(bs_dro):
+    _, p_btw = stats.mannwhitneyu(bs_pre, bs_dro, alternative="greater")  # pre>drought => convergence
+    print(f"Between-site BC (Site1 vs Site2)  pre={bs_pre.mean():.3f}  drought={bs_dro.mean():.3f}  conv MWU p={p_btw:.3g}")
+else:
+    p_btw = np.nan; print("Between-site test: insufficient site replication")
 
 # ---- Convergence: mean distance-to-centroid per condition -----------------
 # (skbio permdisp uses median; also compute mean within-group BC for clarity)
@@ -133,4 +188,7 @@ with open(f"{RES}/stats_summary.txt", "w") as f:
     f.write(f"PERMANOVA_F\t{pn['test statistic']:.4f}\nPERMANOVA_p\t{pn['p-value']:.4g}\n")
     f.write(f"PERMDISP_F\t{pd_disp['test statistic']:.4f}\nPERMDISP_p\t{pd_disp['p-value']:.4g}\n")
     f.write(f"withinBC_pre\t{wd_pre.mean():.4f}\nwithinBC_drought\t{wd_dro.mean():.4f}\nconvergence_MWU_p\t{p_disp_mwu:.4g}\n")
+    if len(bs_pre) and len(bs_dro):
+        f.write(f"betweenSiteBC_pre\t{bs_pre.mean():.4f}\nbetweenSiteBC_drought\t{bs_dro.mean():.4f}\nbetweenSite_conv_MWU_p\t{p_btw:.4g}\n")
+    f.write(f"pcoa_negative_eigen_pct\t{neg_frac:.2f}\n")
 print("\nDONE diversity_analysis — figs in figs/, results in results/")

@@ -1,0 +1,11 @@
+OK	dirmult_ttest
+OK	dirmult_lme
+OK	ancombc
+OK	power
+OK	aitchison_stats.txt
+OK	clr_diff_abundance.tsv
+OK	plot_collapsed_drought.tsv
+OK	power_analysis.txt
+OK	aitchison_p in (0,1]
+OK	CLR Nitrospira down
+OK	fig10 written

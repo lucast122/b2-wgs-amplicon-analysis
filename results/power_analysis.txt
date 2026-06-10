@@ -1,0 +1,4 @@
+n_pre	17
+n_drought	19
+min_detectable_Cohens_d_80pct	0.963
+power_at_d0.8	0.644

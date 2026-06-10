@@ -1,0 +1,4 @@
+PERMANOVA_Aitchison_F	1.0275
+PERMANOVA_Aitchison_p	0.384
+PERMDISP_Aitchison_F	0.0109
+PERMDISP_Aitchison_p	0.91

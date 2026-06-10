@@ -16,7 +16,8 @@ stats = {}
 for line in open(f"{RES}/stats_summary.txt"):
     k, v = line.strip().split("\t"); stats[k] = v
 shift = pd.read_csv(f"{RES}/phylum_shift_pre_vs_drought.tsv", sep="\t")
-sig = shift[shift.MWU_p < 0.05]
+sig = shift[shift.MWU_p < 0.05]                       # raw p (pre-correction)
+sig_fdr = shift[shift.get("q_BH", pd.Series(1, index=shift.index)) < 0.05]  # survive BH-FDR
 
 # amplicon (16S) drought results
 amp = pd.read_csv(f"{RES}/amplicon_phylum_drought.tsv", sep="\t")
@@ -40,15 +41,67 @@ spd = pd.read_csv(f"{RES}/species_drought.tsv", sep="\t")
 spd = spd[~spd.species.str.startswith("t__")]
 sp_nitro = spd[spd.species.str.startswith("Nitrospira_D sp")].iloc[0]
 
+# --- Tier 1 robustness numbers (compositional + pseudoreplication + power) ---
+def _kv(fn):
+    d = {}; p = f"{RES}/{fn}"
+    if os.path.exists(p):
+        for line in open(p):
+            if "\t" in line: k, v = line.strip().split("\t"); d[k] = v
+    return d
+ait = _kv("aitchison_stats.txt"); pwr = _kv("power_analysis.txt")
+def _nsig(fn):
+    p = f"{RES}/{fn}"
+    if os.path.exists(p):
+        try:
+            d = pd.read_csv(p, sep="\t")
+            if "Signif" in d.columns: return int(d["Signif"].sum())
+        except Exception: pass
+    return None
+n_dmt = _nsig("dirmult_ttest_genus.tsv"); n_lme = _nsig("dirmult_lme_plot_genus.tsv")
+def _row(fn, col, val):
+    p = f"{RES}/{fn}"
+    if os.path.exists(p):
+        d = pd.read_csv(p, sep="\t"); m = d[d[col].astype(str).str.startswith(val)]
+        if len(m): return m.iloc[0]
+    return None
+clr_nit = _row("clr_diff_abundance.tsv", "genus", "Nitrospira_D")
+pc_nit  = _row("plot_collapsed_drought.tsv", "genus", "Nitrospira_D")
+T1 = os.path.exists(f"{RES}/aitchison_stats.txt")   # gate the robustness section
+
 def shift_table(df):
     rows = ""
     for _, r in df.head(8).iterrows():
-        sigmark = " <b>*</b>" if r.MWU_p < 0.05 else ""
         arrow = "▲" if r.drought_mean > r.pre_mean else "▼"
+        q = r["q_BH"] if "q_BH" in df.columns else float("nan")
+        eff = r["cliffs_mag"] if "cliffs_mag" in df.columns else ""
         rows += (f"<tr><td>{r.phylum}</td><td>{r.pre_mean:.2f}</td>"
                  f"<td>{r.drought_mean:.2f} {arrow}</td><td>{r.log2FC:+.2f}</td>"
-                 f"<td>{r.MWU_p:.3f}{sigmark}</td></tr>")
+                 f"<td>{r.MWU_p:.3f}</td><td>{q:.2f}</td><td>{eff}</td></tr>")
     return rows
+
+_aitp = ait.get('PERMANOVA_Aitchison_p', '—')
+_clrq = f"{clr_nit['q_BH']:.2f}" if clr_nit is not None else "—"
+_pcp  = f"{pc_nit['MWU_p_plot']:.2f}" if pc_nit is not None else "—"
+_pwrd = pwr.get('min_detectable_Cohens_d_80pct', '—')
+robustness_html = f"""
+<h3>3b. Robustness — the signal does not survive compositional or design-aware correction</h3>
+<p>Relative abundances are compositional and the three timepoints are repeated measures of the
+same plots, so we re-tested the drought contrast with methods that control for both
+(see <a href="methods.html">methods §5.2–5.3</a>). The headline does not strengthen — it weakens:</p>
+<table><tr><th>Test (what it controls for)</th><th>Result for the pre-vs-drought contrast</th></tr>
+<tr><td>Aitchison/CLR PCoA — PERMANOVA (compositionality)</td><td>p={_aitp} — no community structure</td></tr>
+<tr><td>CLR Welch + BH-FDR (compositionality)</td><td><i>Nitrospira</i> is the top hit but q={_clrq} — n.s.</td></tr>
+<tr><td>Dirichlet-multinomial <i>t</i>-test (compositionality)</td><td><b>{n_dmt if n_dmt is not None else '—'}</b> genera significant</td></tr>
+<tr><td>Dirichlet-multinomial mixed model, <b>plot random effect</b> (pseudoreplication)</td><td><b>{n_lme if n_lme is not None else '—'}</b> genera significant</td></tr>
+<tr><td>Plot-collapsed Mann–Whitney (pseudoreplication)</td><td><i>Nitrospira</i> p={_pcp}</td></tr></table>
+<div class="caveat"><b>Honest bottom line:</b> under compositionally-correct and plot-aware
+analysis, <b>no taxon shows a statistically significant drought shift</b>, and the design is
+underpowered (n=17 vs 19; smallest effect detectable at 80% power is Cohen's d&asymp;{_pwrd}).
+The <i>Nitrospira</i>/nitrification pattern remains the strongest and most internally
+consistent observation in the data — largest effect size, same direction at every taxonomic
+rank, and directionally reproduced in the 328-sample 16S survey — but it is most defensibly
+reported as a <b>hypothesis for a powered, paired follow-up</b>, not an established effect.</div>
+""" if T1 else ""
 
 html = f"""<!doctype html><html><head><meta charset="utf-8">
 <title>GBI Biosphere 2 Drought — Soil Microbiome Metagenomics</title>
@@ -72,15 +125,20 @@ shotgun-metagenomic and 16S-amplicon profiling of the soil microbiome — adding
 taxonomic "who is present" axis to the ¹³C carbon-flux measurements in the manuscript.
 Shotgun profiling with sylph (GTDB r232 + FungiRefSeq + custom AMF database);
 {stats.get('n_samples','36')} samples passing QC across pre-drought and drought conditions.</p>
+<p style="margin-top:-4px"><a href="methods.html"><b>📋 Read the detailed methods &rarr;</b></a>
+<span class="muted">(separate page — samples, databases, the Kaiju build, and full statistics)</span></p>
 
-<div class="key"><b>Headline:</b> The bulk soil bacterial/archaeal community is
-<b>compositionally resilient</b> to drought — overall diversity and community structure
-do not shift significantly. Against that stable backdrop, two phyla move in opposite,
-ecologically coherent directions: drought-tolerant <b>Actinomycetota increase</b> and
-nitrite-oxidizing <b>Nitrospirota decrease</b> — and both shifts reproduce in an
-independent 328-sample 16S amplicon survey. This fits the picture in the manuscript, where
-drought adaptation operates through subtle carbon-allocation shifts rather than wholesale
-community turnover.</div>
+<div class="key"><b>Headline:</b> At this sample size (n={stats.get('n_samples','36')}) the bulk
+soil bacterial/archaeal community shows <b>no drought shift detectable</b> in overall
+diversity or community structure, and <b>no individual taxon survives multiple-testing
+correction</b>. Against that backdrop one signal stands out by <i>converging evidence</i>
+rather than a single p-value: a suppression of <b>nitrite-oxidising <i>Nitrospira</i></b>
+that is directionally consistent from phylum → genus → strain, carries a <b>large</b> effect
+size at genus level (Cliff's δ≈−0.63), and reproduces in an independent 328-sample 16S
+survey; alongside it the drought-tolerant <b>Actinomycetota increase</b> (medium effect,
+also seen in 16S). This fits the manuscript's picture of drought adaptation via subtle
+carbon/nitrogen-allocation shifts rather than wholesale community turnover — but is framed
+here as a <i>well-supported hypothesis</i>, not a significant result.</div>
 
 <h2>1. Community composition</h2>
 <p>The soil is bacteria-dominated (~95%), with a substantial ammonia-oxidising archaeal
@@ -91,15 +149,21 @@ near-identical between conditions — the drought signal is in specific taxa, no
 
 <h2>2. Drought response — the clearest signal</h2>
 <p>Comparing pre-drought vs drought samples phylum-by-phylum (Mann–Whitney U):</p>
-<table><tr><th>Phylum</th><th>pre %</th><th>drought %</th><th>log2 FC</th><th>p</th></tr>
+<table><tr><th>Phylum</th><th>pre %</th><th>drought %</th><th>log2 FC</th><th>p</th><th>q (BH)</th><th>effect</th></tr>
 {shift_table(shift)}</table>
-<p><b>{len(sig)} phyla shift significantly (p&lt;0.05):</b>
+<p>Two phyla move at raw p&lt;0.05 in ecologically coherent directions:
 <i>Actinomycetota</i> rise from {shift.loc[shift.phylum=='Actinomycetota','pre_mean'].values[0]:.1f}%
 to {shift.loc[shift.phylum=='Actinomycetota','drought_mean'].values[0]:.1f}%
-(p={shift.loc[shift.phylum=='Actinomycetota','MWU_p'].values[0]:.3f}), and
+(p={shift.loc[shift.phylum=='Actinomycetota','MWU_p'].values[0]:.3f}, medium effect), and
 <i>Nitrospirota</i> fall from {shift.loc[shift.phylum=='Nitrospirota','pre_mean'].values[0]:.1f}%
 to {shift.loc[shift.phylum=='Nitrospirota','drought_mean'].values[0]:.1f}%
-(p={shift.loc[shift.phylum=='Nitrospirota','MWU_p'].values[0]:.3f}).</p>
+(p={shift.loc[shift.phylum=='Nitrospirota','MWU_p'].values[0]:.3f}, medium effect).</p>
+<div class="caveat"><b>After multiple-testing correction (Benjamini–Hochberg over
+{len(shift)} phyla), no phylum survives at q&lt;0.05</b> (both q≈{shift.loc[shift.phylum=='Nitrospirota','q_BH'].values[0]:.2f}).
+The phylum table is therefore <i>suggestive, not significant</i> on its own. What makes the
+N-cycling signal credible is not the phylum p-value but its <b>consistency across ranks
+(phylum→genus→strain), its large effect size at genus level, and its reproduction in an
+independent 16S survey</b> (below) — convergent lines of evidence rather than a single test.</div>
 <div class="key"><b>Why this matters:</b> Actinomycetota are textbook drought-tolerant soil
 bacteria (thick peptidoglycan walls, sporulation, osmolyte accumulation). Their relative
 increase is an independent confirmation that the drought treatment imposed real water
@@ -111,7 +175,8 @@ nitrification — a functionally meaningful change in N-cycling.</div>
 <p>Resolving to genus pinpoints the functional groups behind the phylum shifts. The
 strongest single response in the entire dataset is the nitrite-oxidiser
 <b><i>Nitrospira</i></b>, which drops from {g_nitro['pre']:.2f}% to {g_nitro['drought']:.2f}%
-(<b>p={g_nitro['p']:.4f}</b>) — i.e. the Nitrospirota phylum decline <i>is</i> a Nitrospira
+(<b>p={g_nitro['p']:.4f}</b>, q={g_nitro['q_BH']:.2f}, Cliff's δ={g_nitro['cliffs_delta']:.2f} —
+<b>large effect</b>) — i.e. the Nitrospirota phylum decline <i>is</i> a Nitrospira
 decline, a direct hit to nitrification. Alongside it the nitrogen-fixer / legume root
 symbiont <b><i>Bradyrhizobium</i></b> falls ({g_brady['pre']:.2f}→{g_brady['drought']:.2f}%,
 p={g_brady['p']:.3f}), while the methylotroph <i>Methyloceanibacter</i> rises
@@ -138,12 +203,16 @@ ecosystem harbouring novel soil taxa.</p>
 <p>Second, the nitrogen-cycle signal sharpens to a <b>single strain</b>: the
 nitrite-oxidiser decline tracks one dominant <i>Nitrospira</i> genome
 (<code>GCA_029194675.1</code>), down {sp_nitro['pre']:.2f}→{sp_nitro['drought']:.2f}%
-(<b>p={sp_nitro['p']:.3f}</b>). Critically, the same decline is significant at
-<b>every taxonomic rank</b> — phylum → genus → strain — which makes drought-suppressed
-nitrification the most defensible result in the dataset.</p>
+(<b>p={sp_nitro['p']:.3f}</b>, q={sp_nitro['q_BH']:.2f}). Critically, the same decline is
+present at <b>every taxonomic rank</b> — phylum → genus → strain (raw p&lt;0.05 throughout;
+q≈0.07–0.12 after correction) — which, together with its large effect size and independent
+16S reproduction, makes drought-suppressed nitrification the most internally consistent
+observation in the dataset. It nonetheless does <b>not</b> survive compositional or
+plot-level correction (§3b), so we frame it as a strong hypothesis rather than an
+established effect.</p>
 <div class="fig">{img('09_nitrospira_ranks.png')}</div>
 
-<h2>3. Diversity and community structure are resilient</h2>
+<h2>3. Diversity and community structure: no detectable shift</h2>
 <p>Genus-level Shannon diversity does not differ between conditions
 (pre {float(stats['shannon_pre']):.2f} vs drought {float(stats['shannon_drought']):.2f},
 p={float(stats['shannon_MWU_p']):.2f}). In Bray–Curtis ordination, drought and pre-drought
@@ -156,14 +225,22 @@ timepoints (PERMANOVA p=0.79 drought, p=0.88 pre-drought; 0 of 11–13 phyla shi
 confirms the standing DNA community does not turn over during labelling — so the
 ¹³C-activity dynamics in the manuscript reflect metabolic shifts <i>within</i> a stable
 community, and pooling timepoints for the drought contrast introduces no confound.</p>
-<div class="fig">{img('01_alpha_shannon.png')}{img('02_pcoa_braycurtis.png')}</div>
+<div class="fig">{img('01_alpha_shannon.png')}{img('02_pcoa_braycurtis.png')}{img('02b_pcoa_site.png')}{img('10_aitchison_pcoa.png')}</div>
+<p class="muted">Markers encode the design: in the first ordination colour = condition and
+shape = timepoint; in the second colour = site (Site1/Site2/CTRL) and shape = condition.
+Sites intermix completely.</p>
 <p class="muted">Note on "convergence": the manuscript describes drought reducing
 site-to-site variation in ¹³C-utilisation. At the level of bulk taxonomic composition we do
 not see a matching convergence — within-condition dissimilarity is comparable (pre
-{float(stats['withinBC_pre']):.2f}, drought {float(stats['withinBC_drought']):.2f}). The
+{float(stats['withinBC_pre']):.2f}, drought {float(stats['withinBC_drought']):.2f}), and a
+direct between-site test (Site1 vs Site2 Bray–Curtis, pre vs drought) shows no convergence
+either (pre {float(stats.get('betweenSiteBC_pre',0)):.2f}, drought
+{float(stats.get('betweenSiteBC_drought',0)):.2f}, one-sided p={float(stats.get('betweenSite_conv_MWU_p',1)):.2f};
+sites diverge slightly, if anything, under drought). The
 two measurements capture different things: the DNA profile here is who-is-present, while the
 ¹³C-PLFA signal is who-is-active. A stable DNA pool alongside shifting carbon flux is fully
 consistent — the active sub-community can converge without the standing community changing.</p>
+{robustness_html}
 
 <h2>4. Independent validation: 16S rRNA amplicon survey</h2>
 <p>A separate 16S rRNA amplicon dataset (V4 515F/806R) from the same Biosphere 2 soil was
@@ -218,15 +295,20 @@ progress).</p>
 Funneliformis, Diversispora, Cortinarius, Inocybe, …) will be added once the custom Kaiju
 classification of all 39 samples completes. The database build is finishing now.</div>
 
-<h2>Methods (brief)</h2>
+<h2>Methods (brief) — <a href="methods.html">full detailed methods &rarr;</a></h2>
 <p class="muted">Reads: 39 paired-end Illumina soil metagenomes (Biosphere 2 WALD campaign,
 2019). Profiling: <code>sylph</code> against GTDB r232, FungiRefSeq-2025, and a
 dereplicated 32-genome AMF database; taxonomic tables via <code>sylph-tax</code>.
 Independent 16S: V4 515F/806R EMP amplicons, QIIME 2 2026.4 + DADA2 1.38 + Greengenes2
 2024.09 / SILVA 138.1 (328 samples, 34,594 ASVs); phylum (L2) relative abundances compared
-to the WGS profile. Statistics on genus/phylum relative abundances: Mann–Whitney U (taxa),
-PERMANOVA &amp; PERMDISP on Bray–Curtis distances (999 permutations). {stats.get('n_samples','36')}/39
-shotgun samples passed sketch QC. Figures and tables reproducible from
+to the WGS profile. Statistics on genus/phylum relative abundances: Mann–Whitney U (taxa) with
+Benjamini–Hochberg FDR (q-values) and Cliff's δ effect sizes; PERMANOVA &amp; PERMDISP on
+Bray–Curtis distances (999 permutations). {stats.get('n_samples','36')}/39 shotgun samples
+passed sketch QC — the 3 dropped (2 CTRL, 1 Site1) leave the CTRL site with a single shotgun
+sample, so cross-site contrasts rest on Site1 vs Site2. Timepoints (0/6/48 h) are repeated
+measures of the same plots; p-values treat samples as independent and are thus
+anticonservative, so taxon claims are anchored on effect size and cross-assay reproduction
+rather than p alone. Figures and tables reproducible from
 <code>/mnt/disk4/timo/gbi/analysis/</code> and
 <code>/mnt/disk4/timo/gbi/amplicon/reanalysis_2026/</code>.</p>
 

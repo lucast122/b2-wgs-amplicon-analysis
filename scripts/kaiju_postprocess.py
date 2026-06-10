@@ -14,10 +14,11 @@ Output: /mnt/disk4/timo/gbi/analysis/results/
 Safe to run repeatedly; skips missing samples. Designed so the report's
 AMF/EMF section fills in automatically.
 """
-import os, glob, re
+import os, glob, re, sys
 import numpy as np, pandas as pd
 
-KOUT = "/mnt/disk4/timo/gbi/kaiju_out"
+# kaiju output dir: argv[1] if given, else default. (fungi run uses kaiju_out_fungi)
+KOUT = sys.argv[1] if len(sys.argv) > 1 else "/mnt/disk4/timo/gbi/kaiju_out"
 A = "/mnt/disk4/timo/gbi/analysis"
 RES = f"{A}/results"; FIG = f"{A}/figs"
 os.makedirs(RES, exist_ok=True); os.makedirs(FIG, exist_ok=True)
