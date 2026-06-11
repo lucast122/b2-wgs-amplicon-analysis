@@ -122,10 +122,11 @@ print(f"\nPlot-collapsed ({len(pP)} pre vs {len(dP)} drought plots):"); print(pl
 # ---------- power ----------
 try:
     from statsmodels.stats.power import TTestIndPower
-    an=TTestIndPower(); d80=an.solve_power(effect_size=None,nobs1=17,ratio=19/17,alpha=0.05,power=0.8)
-    p08=an.power(effect_size=0.8,nobs1=17,ratio=19/17,alpha=0.05)
+    npre=len(PRE); ndro=len(DRO)
+    an=TTestIndPower(); d80=an.solve_power(effect_size=None,nobs1=npre,ratio=ndro/npre,alpha=0.05,power=0.8)
+    p08=an.power(effect_size=0.8,nobs1=npre,ratio=ndro/npre,alpha=0.05)
     open(f"{RES}/power_analysis.txt","w").write(
-        f"n_pre\t17\nn_drought\t19\nmin_detectable_Cohens_d_80pct\t{d80:.3f}\npower_at_d0.8\t{p08:.3f}\n")
+        f"n_pre\t{npre}\nn_drought\t{ndro}\nmin_detectable_Cohens_d_80pct\t{d80:.3f}\npower_at_d0.8\t{p08:.3f}\n")
     print(f"\nPower: min detectable d={d80:.2f} (80%); power@d=0.8 = {p08:.2f}"); checks.append(("power",True))
 except Exception as e:
     print("power failed:",e); checks.append(("power",False))

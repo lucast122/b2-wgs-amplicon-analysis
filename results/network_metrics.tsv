@@ -1,6 +1,6 @@
 	nodes_total	nodes_connected	edges	density	mean_degree	modularity	avg_clustering	frac_positive
-pre_drought	45.0	32.0	30.0	0.0303	1.333	0.672	0.137	0.7
-drought	45.0	23.0	33.0	0.0333	1.467	0.331	0.227	0.818
+pre_drought	40.0	27.0	34.0	0.0436	1.7	0.322	0.287	0.618
+drought	40.0	23.0	33.0	0.0423	1.65	0.413	0.212	0.788
 
-# edge_diff_perm_p	0.9400
-# obs_edge_diff	3
+# edge_diff_perm_p	1.0000
+# obs_edge_diff	1

@@ -46,9 +46,12 @@ soil, extending the ¹³CO₂ drought manuscript. All code and intermediate tabl
 (WALD drought campaign, 2019), retrieved from SRA (accessions SRR24887495–SRR24888648).
 The design is a 2 × 3 × 3 layout: <b>condition</b> (pre-drought, drought) ×
 <b>timepoint</b> (0 h, 6 h, 48 h of a ¹³C pulse-chase) × <b>site</b> (Site1, Site2, and a
-CTRL plot), with plot-level replication. {stat(stats,'n_samples','36')}/39 samples passed
-sketch quality control; the 3 excluded (2 CTRL, 1 Site1) leave the CTRL plot with a single
-shotgun sample, so site contrasts rest on Site1 vs Site2.</p>
+CTRL plot), with plot-level replication. all {stat(stats,'n_samples','39')}/39 samples were
+profiled. Three (2 CTRL, 1 Site1) initially failed sylph sketching because of corrupted reads
+from a faulty parallel download (a handful of records with malformed quality strings, which
+make the whole file invalid to strict parsers); these were recovered with <code>seqkit sana</code>
+(drop bad records) + <code>seqkit pair</code> (re-sync mates) and re-profiled, restoring the
+CTRL plot.</p>
 <div class="note"><b>Design caveat (carried through all statistics):</b> the three timepoints
 are repeated measures of the same physical plots and are therefore <i>not</i> independent.
 Tests that pool samples (Mann–Whitney, PERMANOVA) treat them as independent and are

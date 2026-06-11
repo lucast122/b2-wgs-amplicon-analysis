@@ -1,5 +1,3 @@
-mean_uncultured_pct	48.7
-min	25.1
-max	63.2
-n_species	173
-n_placeholder	77
+mean_uncultured_pct	79.4072
+min	57.5170
+max	87.8940

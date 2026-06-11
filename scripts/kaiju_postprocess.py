@@ -9,10 +9,12 @@ Input : /mnt/disk4/timo/gbi/kaiju_out/<acc>.genus.tsv
 Output: /mnt/disk4/timo/gbi/analysis/results/
         kaiju_amf_matrix.tsv, kaiju_emf_matrix.tsv, kaiju_domain_fractions.tsv,
         kaiju_amf_drought.tsv, kaiju_emf_drought.tsv
-        figs/09_amf_genera.png, figs/10_kaiju_domains.png
+        (figures are generated at report-integration time, using indices >=12 to
+        avoid clobbering 09_nitrospira / 10_aitchison / 11_networks.)
 
 Safe to run repeatedly; skips missing samples. Designed so the report's
-AMF/EMF section fills in automatically.
+AMF/EMF section fills in automatically. NOTE at integration: express AMF/EMF as a
+fraction of FUNGAL/classified reads (not total), and apply BH-FDR + effect sizes.
 """
 import os, glob, re, sys
 import numpy as np, pandas as pd
@@ -75,7 +77,10 @@ def main():
 
     amf = {}; emf = {}; domain = {}
     for fp in files:
-        acc = re.search(r"(SRR\d+)", os.path.basename(fp)).group(1)
+        m = re.search(r"(SRR\d+)", os.path.basename(fp))
+        if not m:
+            continue
+        acc = m.group(1)
         df = parse_one(fp)
         if df.empty: continue
         # domain fractions (% of classified reads by group)

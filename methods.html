@@ -21,9 +21,12 @@ soil, extending the ¹³CO₂ drought manuscript. All code and intermediate tabl
 (WALD drought campaign, 2019), retrieved from SRA (accessions SRR24887495–SRR24888648).
 The design is a 2 × 3 × 3 layout: <b>condition</b> (pre-drought, drought) ×
 <b>timepoint</b> (0 h, 6 h, 48 h of a ¹³C pulse-chase) × <b>site</b> (Site1, Site2, and a
-CTRL plot), with plot-level replication. 36/39 samples passed
-sketch quality control; the 3 excluded (2 CTRL, 1 Site1) leave the CTRL plot with a single
-shotgun sample, so site contrasts rest on Site1 vs Site2.</p>
+CTRL plot), with plot-level replication. all 39/39 samples were
+profiled. Three (2 CTRL, 1 Site1) initially failed sylph sketching because of corrupted reads
+from a faulty parallel download (a handful of records with malformed quality strings, which
+make the whole file invalid to strict parsers); these were recovered with <code>seqkit sana</code>
+(drop bad records) + <code>seqkit pair</code> (re-sync mates) and re-profiled, restoring the
+CTRL plot.</p>
 <div class="note"><b>Design caveat (carried through all statistics):</b> the three timepoints
 are repeated measures of the same physical plots and are therefore <i>not</i> independent.
 Tests that pool samples (Mann–Whitney, PERMANOVA) treat them as independent and are
@@ -77,8 +80,8 @@ Analysis (PCoA); PERMANOVA and PERMDISP (999 permutations) tested condition stru
 multivariate dispersion. Because Bray–Curtis on proportions is compositional, we additionally
 computed a <b>centred-log-ratio (CLR) / Aitchison</b> ordination (zeros handled by
 multiplicative replacement) and PERMANOVA
-(Aitchison PERMANOVA p=0.384,
-PERMDISP p=0.91) as a compositionally-robust check.</p>
+(Aitchison PERMANOVA p=0.319,
+PERMDISP p=0.966) as a compositionally-robust check.</p>
 <h3>5.2 Differential abundance</h3>
 <p>Per-taxon pre-vs-drought tests were run at phylum, genus and species rank with
 Mann–Whitney U, then corrected for multiple testing with the Benjamini–Hochberg false
@@ -99,9 +102,9 @@ on taxonomic composition: (i) within-condition Bray–Curtis dissimilarity (pre 
 and (ii) between-site Bray–Curtis distance (Site1 vs Site2 pairs, pre vs drought), each by
 one-sided Mann–Whitney (pre &gt; drought = convergence).</p>
 <h3>5.5 Power</h3>
-<p>With n=17 pre-drought vs n=19 drought samples,
+<p>With n=18 pre-drought vs n=21 drought samples,
 the minimum effect detectable at 80% power is Cohen’s
-d&nbsp;&asymp;&nbsp;0.963; the design therefore has
+d&nbsp;&asymp;&nbsp;0.924; the design therefore has
 limited power for small per-taxon shifts, and a non-significant result is read as
 “no shift detectable at this sample size,” not as evidence of no effect.</p>
 

@@ -99,11 +99,12 @@ drought contrast was re-tested with methods controlling for both
 <tr><td>Plot-collapsed Mann–Whitney (pseudoreplication)</td><td><i>Nitrospira</i> p={_pcp}</td></tr>
 <tr><td>Genus co-occurrence networks (structure)</td><td>no connectance shift, perm p={_netp}</td></tr></table>
 <div class="caveat"><b>Bottom line:</b> under compositional- and plot-aware analysis <b>no taxon
-is significant</b>, and the design is underpowered (n=17 vs 19; min detectable d&asymp;{_pwrd}).
-<b>Sampling confound:</b> pre-drought (Sept) and drought (Nov) samples are temporally separated
-and the one contemporaneous control plot is unusable in WGS (2/3 dropped at QC), so drought
-cannot be cleanly separated from season. <i>Nitrospira</i> is the strongest, most consistent
-signal but is best treated as a hypothesis for a powered, season-controlled follow-up.</div>
+is significant</b>, and the design is underpowered (n={pwr.get('n_pre','?')} vs {pwr.get('n_drought','?')};
+min detectable d&asymp;{_pwrd}). <b>Sampling confound:</b> pre-drought (Sept) and drought (Nov)
+samples are temporally separated, so drought is partly confounded with season (the
+contemporaneous CTRL plot carries the drought-period timepoint, not an independent watered
+control). <i>Nitrospira</i> is the strongest, most consistent signal but is best treated as a
+hypothesis for a powered, season-controlled follow-up.</div>
 """ if T1 else ""
 
 html = f"""<!doctype html><html><head><meta charset="utf-8">
@@ -293,6 +294,35 @@ progress).</p>
 Funneliformis, Diversispora, Cortinarius, Inocybe, …) will be added once the custom Kaiju
 classification of all 39 samples completes. The database build is finishing now.</div>
 
+<h2>Plain-language notes on the statistics</h2>
+<p class="muted">A reader's guide to why the headline is framed as a hypothesis — written for
+non-statisticians (e.g. for manuscript text).</p>
+<div class="key" style="font-size:.93em">
+<p><b>Repeated timepoints = pseudoreplication.</b> Each plot was sampled at 0/6/48 h, and the
+standing community does not turn over in that window — so a plot's three timepoints are
+essentially three copies of one community, not three independent samples. Treating them as
+independent is like measuring one patient's blood pressure three times and analysing it as
+three patients: it makes results look more certain than they are. We corrected for this with a
+mixed model (plot as a random effect) and by collapsing each plot to one value; both removed
+the apparent significance.</p>
+<p><b>Effect size (Cliff's δ) = how big, not just whether.</b> A p-value says only "could this
+be chance?"; it says nothing about magnitude. Cliff's δ asks: pick a random drought and a
+random pre-drought sample — how often is one higher? 0 = total overlap, ±1 = complete
+separation. <i>Nitrospira</i>'s δ ≈ −0.63 ("large") means drought samples are almost always
+lower — a strong, consistent shift even though it is not formally significant.</p>
+<p><b>Power = could we even have detected it?</b> Power is the chance of catching a real effect
+if one exists; small studies are a coarse net that only catches the biggest fish. At
+n = {pwr.get('n_pre','?')} vs {pwr.get('n_drought','?')} we can only reliably detect very large
+effects (Cohen's d ≈ {_pwrd}), so "no significant shift" means "none detectable at this sample
+size", <i>not</i> "no shift". A large effect that is
+non-significant in an underpowered study is the signature of a real signal we were too small to
+prove — hence we report it as a hypothesis.</p>
+<p><b>Multiple testing (BH-FDR).</b> Testing many taxa at once guarantees some will look
+significant by chance; the false-discovery-rate correction (q-values) adjusts for that. It is a
+separate issue from the non-independence above — both inflate false positives, and we control
+for both.</p>
+</div>
+
 <h2>Methods (brief) — <a href="methods.html">full detailed methods &rarr;</a></h2>
 <p class="muted">Reads: 39 paired-end Illumina soil metagenomes (Biosphere 2 WALD campaign,
 2019). Profiling: <code>sylph</code> against GTDB r232, FungiRefSeq-2025, and a
@@ -302,8 +332,9 @@ Independent 16S: V4 515F/806R EMP amplicons, QIIME 2 2026.4 + DADA2 1.38 + Green
 to the WGS profile. Statistics on genus/phylum relative abundances: Mann–Whitney U (taxa) with
 Benjamini–Hochberg FDR (q-values) and Cliff's δ effect sizes; PERMANOVA &amp; PERMDISP on
 Bray–Curtis distances (999 permutations). {stats.get('n_samples','36')}/39 shotgun samples
-passed sketch QC — the 3 dropped (2 CTRL, 1 Site1) leave the CTRL site with a single shotgun
-sample, so cross-site contrasts rest on Site1 vs Site2. Timepoints (0/6/48 h) are repeated
+processed — 3 (2 CTRL, 1 Site1) initially failed sylph sketching because of corrupted reads
+from a faulty parallel download (a few records with malformed quality strings) and were
+recovered with <code>seqkit sana</code> + re-pairing before re-profiling. Timepoints (0/6/48 h) are repeated
 measures of the same plots; p-values treat samples as independent and are thus
 anticonservative, so taxon claims are anchored on effect size and cross-assay reproduction
 rather than p alone. Figures and tables reproducible from

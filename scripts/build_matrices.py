@@ -72,7 +72,7 @@ def pivot_rank(rank):
               .fillna(0.0))
     return mat
 
-for rank in ["phylum", "class", "genus"]:
+for rank in ["phylum", "class", "genus", "species"]:
     mat = pivot_rank(rank)
     mat.to_csv(f"{OUT}/{rank}_relabund.tsv", sep="\t")
     print(f"  {rank}: {mat.shape[0]} samples x {mat.shape[1]} taxa")

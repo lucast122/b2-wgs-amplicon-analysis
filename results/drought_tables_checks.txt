@@ -1,0 +1,6 @@
+OK	genus_drought rows>0
+OK	species_drought rows>0
+OK	Nitrospira genus present
+OK	Nitrospira species present
+OK	Nitrospira_D down in drought
+OK	uncultured mean in (0,100]
