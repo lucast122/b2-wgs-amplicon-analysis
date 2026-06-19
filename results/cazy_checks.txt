@@ -1,0 +1,7 @@
+OK	n_samples >= 36
+OK	families detected > 100
+OK	GH class present
+OK	class+family drought tables
+OK	figure written
+n_class_signif_q05	0
+n_family_signif_q05	0

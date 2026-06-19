@@ -279,6 +279,31 @@ against this drought.</div>
 <div class="fig">{img('15_ncyc_drought.png')}</div>
 """ if NCYC_OK else "")
 
+# --- Tier-2 CAZyme functional potential (dbCAN) ---
+CAZY_OK = os.path.exists(f"{RES}/cazy_class_hpm.tsv")
+if CAZY_OK:
+    _cz = pd.read_csv(f"{RES}/cazy_class_hpm.tsv", sep="\t", index_col=0)
+    _cs = [x for x in _cz.index if x in _meta.index]; _cmd = _meta.loc[_cs]
+    _cpre = [x for x in _cmd.index[_cmd.condition=="pre-drought"]]
+    _cdro = [x for x in _cmd.index[_cmd.condition=="drought"]]
+    def _czg(cl):
+        return (_cz.loc[_cpre, cl].mean(), _cz.loc[_cdro, cl].mean()) if cl in _cz.columns else (float('nan'), float('nan'))
+    _ghp, _ghd = _czg("GH"); _aap, _aad = _czg("AA")
+    _czfd = pd.read_csv(f"{RES}/cazy_family_drought.tsv", sep="\t") if os.path.exists(f"{RES}/cazy_family_drought.tsv") else pd.DataFrame()
+    _cznsig = int((_czfd["q_BH"] < 0.05).sum()) if len(_czfd) else 0
+else:
+    _ghp=_ghd=_aap=_aad=float('nan'); _cznsig=0
+cazy_html = (f"""
+<p><b>Carbohydrate-active enzymes (CAZymes; dbCAN, 4.1 M sequences).</b> The same pattern holds on
+the carbon side: glycoside-hydrolase (GH; carbohydrate/litter degradation) and auxiliary-activity
+(AA; ligninolytic/redox) gene potential are unchanged under drought (GH {_ghp:.0f}&rarr;{_ghd:.0f};
+AA {_aap:.0f}&rarr;{_aad:.0f} hits/million reads) and <b>no CAZy class or family survives FDR</b>
+({_cznsig} significant). The community's <i>degradative</i> gene repertoire is buffered too — so the
+¹³C drought response is a <i>re-routing of carbon to fungal partners</i> (&sect;6), not a change in
+the standing pool of carbohydrate-degrading or nitrogen-cycling genes.</p>
+<div class="fig">{img('16_cazy_classes.png')}</div>
+""" if CAZY_OK else "")
+
 html = f"""<!doctype html><html><head><meta charset="utf-8">
 <title>GBI Biosphere 2 Drought — Soil Microbiome Metagenomics</title>
 <style>
@@ -460,6 +485,7 @@ AMF spores — a trace of the mycorrhizal fungi the 16S cannot otherwise see.</d
 low-coverage in bulk shotgun).</p>
 {amf_html}
 {ncyc_html}
+{cazy_html}
 {discussion_html}
 <h2>Plain-language notes on the statistics</h2>
 <p class="muted">A reader's guide to why the headline is framed as a hypothesis — written for
