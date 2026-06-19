@@ -167,6 +167,67 @@ precise quantities. No AMF/EMF genus shows a drought shift surviving FDR.</div>"
 if AMF_OK else
 '<div class="caveat"><b>Pending:</b> AMF/EMF genus breakdown once the custom Kaiju classification completes.</div>')
 
+# fungal guild pre vs drought (for the discussion)
+if AMF_OK:
+    _s = [x for x in _domf.index if x in _meta.index]; _md = _meta.loc[_s]
+    _pre = [x for x in _md.index[_md.condition=="pre-drought"]]; _dro = [x for x in _md.index[_md.condition=="drought"]]
+    _tf = _domf[["AMF","EMF","Fungi_other"]].sum(1)
+    _fpre, _fdro = _tf.loc[_pre].mean(), _tf.loc[_dro].mean()
+else:
+    _fpre = _fdro = float('nan')
+discussion_html = f"""
+<h2>6. Discussion: reconciling the metagenome with the ¹³C carbon-flux experiment</h2>
+<p>The companion B2 WALD ¹³CO₂ pulse-labeling indicates drought re-routes recent plant carbon
+into <b>mycorrhizal and saprotrophic fungal</b> lipid biomarkers — yet here the standing fungal
+community is essentially <b>unchanged</b> (total fungi {_fpre:.1f}&rarr;{_fdro:.1f}% of reads;
+AMF, EMF and saprotrophs all flat, none surviving FDR). These results are <b>complementary, not
+contradictory</b> — the two assays measure different axes of the same system.</p>
+<div class="key"><b>Take-aways</b>
+<ul>
+<li><b>Abundance &ne; activity.</b> ¹³C-PLFA/NLFA tracks <i>carbon flux into active lipid
+synthesis</i> over hours–days; shotgun reads track <i>standing DNA</i> integrated over weeks. A
+fungus can take up more recent carbon without its genome pool changing — the very gap that
+stable-isotope probing (SIP) was developed to close.<sup>[3]</sup></li>
+<li><b>Flux goes to storage, not necessarily new biomass.</b> Drought ¹³C is allocated
+preferentially to fungal <i>storage lipids</i> rather than hyphal growth, so an allocation signal
+need not appear as more cells or DNA.<sup>[6]</sup></li>
+<li><b>Relative ≠ absolute.</b> Shotgun profiles are compositional; a guild can rise in absolute
+biomass yet stay flat in %. Relative abundances are documented to be misleading for quantitative
+fungal dynamics.<sup>[5]</sup></li>
+<li><b>Compartment &amp; detection limit.</b> ¹³C labels the root/myco-rhizosphere interface;
+bulk-soil shotgun under-samples that active fraction, and AMF/EMF (low-biomass, large/patchy
+genomes, sparse references) sit near our detection floor (~6% of an already ~3% fungal fraction).</li>
+<li><b>Precedent in the literature.</b> DNA/amplicon abundance generally does <i>not</i> track
+isotope-based activity under drought — e.g. only 8% of prokaryote and 25% of fungal OTUs shifted
+across a drought–rewet cycle<sup>[4]</sup> — and the B2 soils themselves show a strong
+<i>functional</i> drought response (carbon re-routed to volatile metabolites) with no requirement
+that taxonomic abundance mirror it.<sup>[2]</sup></li>
+</ul>
+<b>Bottom line:</b> &ldquo;no abundance shift&rdquo; does not refute &ldquo;more carbon to
+fungi.&rdquo; The metagenome shows a <i>compositionally buffered</i> community over the drought
+window; the ¹³C shows an <i>allocational/functional</i> response. The definitive reconciliation
+would be <b>DNA- or quantitative-SIP metagenomics</b> on the ¹³C-labeled soils (heavy-fraction
+sequencing of the active community) — the natural follow-up this bulk-shotgun survey cannot itself
+provide.</div>
+<p class="muted" style="font-size:.82em"><b>References.</b>
+[1] <a href="https://meetingorganizer.copernicus.org/EGU24/EGU24-17755.html">Belowground C
+allocation of tropical rainforests under drought: an ecosystem ¹³CO₂ labeling experiment</a>.
+EGU General Assembly 2024, EGU24-17755 (B2 WALD campaign). &nbsp;
+[2] <a href="https://www.nature.com/articles/s41564-023-01432-9">Drought re-routes soil microbial
+carbon metabolism towards emission of volatile metabolites in an artificial tropical
+rainforest</a>. <i>Nat. Microbiol.</i> 2023. &nbsp;
+[3] <a href="https://journals.asm.org/doi/10.1128/msystems.00417-22">Quantitative stable-isotope
+probing (qSIP) with metagenomics links microbial physiology and activity to soil moisture</a>.
+<i>mSystems</i> 2022. &nbsp;
+[4] <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5845876/">Drought legacy effects on the
+composition of soil fungal and prokaryote communities</a>. 2018. &nbsp;
+[5] <a href="https://www.mdpi.com/2076-2607/9/3/589">Relative abundances of species or sequence
+variants can be misleading: soil fungal communities as an example</a>. <i>Microorganisms</i> 2021. &nbsp;
+[6] <a href="https://link.springer.com/article/10.1007/s00374-022-01670-9">Fatty acid 16:1ω5 as a
+proxy for arbuscular mycorrhizal fungal biomass: current challenges and ways forward</a>.
+<i>Biol. Fertil. Soils</i> 2022.</p>
+"""
+
 html = f"""<!doctype html><html><head><meta charset="utf-8">
 <title>GBI Biosphere 2 Drought — Soil Microbiome Metagenomics</title>
 <style>
@@ -347,7 +408,7 @@ AMF spores — a trace of the mycorrhizal fungi the 16S cannot otherwise see.</d
 (EMF) fungi below Opisthokonta, and sylph genome-containment finds no AMF/EMF (too
 low-coverage in bulk shotgun).</p>
 {amf_html}
-
+{discussion_html}
 <h2>Plain-language notes on the statistics</h2>
 <p class="muted">A reader's guide to why the headline is framed as a hypothesis — written for
 non-statisticians (e.g. for manuscript text).</p>
