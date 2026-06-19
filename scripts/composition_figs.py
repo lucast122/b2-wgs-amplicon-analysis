@@ -5,7 +5,7 @@ import numpy as np, pandas as pd
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-A = "/mnt/disk4/timo/gbi/analysis"; FIG = f"{A}/figs"
+A = "/mnt/disk4/timo/gbi/b2/analysis"; FIG = f"{A}/figs"
 meta = pd.read_csv(f"{A}/metadata.tsv", sep="\t", index_col=0)
 phylum = pd.read_csv(f"{A}/phylum_relabund.tsv", sep="\t", index_col=0)
 samples = [s for s in phylum.index if s in meta.index]

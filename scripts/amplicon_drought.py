@@ -11,10 +11,10 @@ from scipy import stats
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-AMP = "/mnt/disk4/timo/gbi/amplicon/reanalysis_2026"
+AMP = "/mnt/disk4/timo/gbi/b2/amplicon/reanalysis_2026"
 L2 = f"{AMP}/07_wgs_compare/amplicon_tables/gg2_L2_rel.tsv"
 META = f"{AMP}/metadata/sample-metadata.tsv"
-OUT = "/mnt/disk4/timo/gbi/analysis"; FIG = f"{OUT}/figs"; RES = f"{OUT}/results"
+OUT = "/mnt/disk4/timo/gbi/b2/analysis"; FIG = f"{OUT}/figs"; RES = f"{OUT}/results"
 
 # ---- load L2 (skip '# Constructed' line; 2nd line header) ----
 tab = pd.read_csv(L2, sep="\t", skiprows=1, index_col=0)

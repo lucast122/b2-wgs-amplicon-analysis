@@ -15,7 +15,7 @@ from skbio.stats.composition import clr, multi_replace, ancombc, dirmult_ttest, 
 from skbio.stats.distance import permanova, permdisp, DistanceMatrix
 from skbio.stats.ordination import pcoa
 
-A = "/mnt/disk4/timo/gbi/analysis"; FIG = f"{A}/figs"; RES = f"{A}/results"
+A = "/mnt/disk4/timo/gbi/b2/analysis"; FIG = f"{A}/figs"; RES = f"{A}/results"
 meta = pd.read_csv(f"{A}/metadata.tsv", sep="\t", index_col=0)
 genus = pd.read_csv(f"{A}/genus_relabund.tsv", sep="\t", index_col=0)
 phylum = pd.read_csv(f"{A}/phylum_relabund.tsv", sep="\t", index_col=0)

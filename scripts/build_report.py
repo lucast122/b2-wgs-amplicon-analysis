@@ -3,7 +3,7 @@
 import base64, os
 import pandas as pd
 
-A = "/mnt/disk4/timo/gbi/analysis"; FIG = f"{A}/figs"; RES = f"{A}/results"
+A = "/mnt/disk4/timo/gbi/b2/analysis"; FIG = f"{A}/figs"; RES = f"{A}/results"
 OUT = f"{A}/GBI_Biosphere2_drought_microbiome_report.html"
 
 def img(name):
@@ -106,6 +106,66 @@ contemporaneous CTRL plot carries the drought-period timepoint, not an independe
 control). <i>Nitrospira</i> is the strongest, most consistent signal but is best treated as a
 hypothesis for a powered, season-controlled follow-up.</div>
 """ if T1 else ""
+
+# --- protein cross-validation (Kaiju nr_euk + DIAMOND) and AMF/EMF (Kaiju fungi DB) ---
+dchk = _kv("diamond_checks.txt")
+DIA_OK = os.path.exists(f"{RES}/diamond_checks.txt")
+AMF_OK = os.path.exists(f"{RES}/kaiju_amf_fungalnorm.tsv")
+_meta = pd.read_csv(f"{A}/metadata.tsv", sep="\t", index_col=0)
+def _nit_means(fn):
+    p = f"{RES}/{fn}"
+    if not os.path.exists(p): return (float('nan'), float('nan'))
+    m = pd.read_csv(p, sep="\t", index_col=0)
+    col = [c for c in m.columns if "Nitrospira" in c]
+    if not col: return (float('nan'), float('nan'))
+    s = [x for x in m.index if x in _meta.index]; md = _meta.loc[s]
+    pre = [x for x in md.index[md.condition=="pre-drought"]]
+    dro = [x for x in md.index[md.condition=="drought"]]
+    return (m.loc[pre, col[0]].mean(), m.loc[dro, col[0]].mean())
+_dspear = float(dchk.get("median_spearman_vs_kaiju", "nan"))
+_dov = int(round(float(dchk.get("top15_overlap", "0")) * 15))
+_dnp, _dnd = _nit_means("diamond_genus_relabund.tsv")
+_knp, _knd = _nit_means("fullnr_genus_relabund.tsv")
+protein_html = f"""
+<h3>4b. Protein-level cross-validation: two aligners, one answer</h3>
+<p>The shotgun reads were independently re-classified at the protein level with <b>Kaiju</b>
+(maximum-exact-match) and <b>DIAMOND</b> (double-indexed alignment, <code>-f102</code> LCA)
+against the <i>same</i> cleaned nr_euk protein database &mdash; so any difference reflects the
+aligner, not the reference. The two give <b>highly concordant community profiles</b> (median
+per-sample Spearman &rho;={_dspear:.2f}; {_dov}/15 top genera shared) and rank the same
+nitrogen-cycling / rhizosphere taxa as dominant (<i>Bradyrhizobium, Nitrospira, Luteitalea,
+Mesorhizobium</i>).</p>
+<div class="key"><b><i>Nitrospira</i> declines under drought in every method.</b> The nitrite
+oxidiser drops pre&rarr;drought in DIAMOND ({_dnp:.1f}&rarr;{_dnd:.1f}% of classified reads),
+in Kaiju ({_knp:.1f}&rarr;{_knd:.1f}%), in sylph genome-containment, and in the 328-sample 16S
+survey &mdash; <b>four independent assays, same direction.</b> A pattern reproduced across
+genome-containment and two protein aligners is the strongest evidence in this study, even
+though it still does not survive the pseudoreplication-corrected test (&sect;3b).</div>
+<div class="fig">{img('14_diamond_vs_kaiju.png')}</div>
+""" if DIA_OK else ""
+
+_amf = (pd.read_csv(f"{RES}/kaiju_amf_fungalnorm.tsv", sep="\t", index_col=0) if AMF_OK else None)
+_emf = (pd.read_csv(f"{RES}/kaiju_emf_fungalnorm.tsv", sep="\t", index_col=0) if AMF_OK else None)
+_domf = (pd.read_csv(f"{RES}/kaiju_domain_fractions.tsv", sep="\t", index_col=0) if AMF_OK else None)
+_rh = (_amf["Rhizophagus"].mean() if (AMF_OK and "Rhizophagus" in _amf.columns) else float('nan'))
+_ff = (_domf[["AMF","EMF","Fungi_other"]].sum(1).mean() if AMF_OK else float('nan'))
+_ep = (_emf.sum(1).mean() if AMF_OK else float('nan'))
+amf_html = (f"""<p>Resolving the mycorrhizal community needs read-level protein classification
+against a fungal-enriched database. All 39 samples were classified with a custom <b>Kaiju
+fungal DB</b> (nr_euk fungi + 32 AMF genomes + EMF references), recovering the AMF/EMF genera
+that SSU surveys and genome-containment miss.</p>
+<div class="key"><b>Arbuscular mycorrhizal fungi (AMF) are present, dominated by
+<i>Rhizophagus</i></b> (&asymp;{_rh:.1f}% of fungal reads; fungi are {_ff:.1f}% of all reads).
+Further AMF: <i>Oehlia, Acaulospora, Paraglomus, Diversispora</i>. Ectomycorrhizal signal is
+lower (&asymp;{_ep:.1f}% of fungal reads), led by <i>Russula</i> and <i>Tuber</i>. Full AMF/EMF
+genus matrices (% of fungal and of total reads) + drought tests: companion Excel
+(<code>GBI_AMF_EMF_kaiju.xlsx</code>).</div>
+<div class="fig">{img('12_amf_emf_genera.png')}</div>
+<div class="caveat">AMF/EMF reads are a small fraction of bulk-soil shotgun data, so genus
+proportions carry wide per-sample variance &mdash; read as presence / relative dominance, not
+precise quantities. No AMF/EMF genus shows a drought shift surviving FDR.</div>"""
+if AMF_OK else
+'<div class="caveat"><b>Pending:</b> AMF/EMF genus breakdown once the custom Kaiju classification completes.</div>')
 
 html = f"""<!doctype html><html><head><meta charset="utf-8">
 <title>GBI Biosphere 2 Drought — Soil Microbiome Metagenomics</title>
@@ -280,19 +340,13 @@ drought responses beyond Actinomycetota/Nitrospirota are method-dependent and sh
 treated as provisional. 16S primers are prokaryote-only (no fungi); notably the one
 "fungal" hit is <i>Glomeribacter</i>, the bacterial endosymbiont that lives <i>inside</i>
 AMF spores — a trace of the mycorrhizal fungi the 16S cannot otherwise see.</div>
-
+{protein_html}
 <h2>5. Eukaryotes and mycorrhizal fungi</h2>
-<p>SSU-based screening (phyloFlash/SILVA) detects eukaryotic and plant signal in every
-sample, confirming root/fungal material in the soil. However, SILVA cannot resolve
-arbuscular (AMF) or ectomycorrhizal (EMF) fungi below the Opisthokonta level, and sylph's
-genome-containment approach finds no AMF/EMF (they are too low-coverage in bulk shotgun
-data). Resolving the AMF/EMF community — the mycorrhizal symbionts central to the
-belowground carbon story in the manuscript — requires read-level protein classification
-against a custom AMF/EMF-enriched database (<code>kaiju nr_euk + AMF + EMF</code>, in
-progress).</p>
-<div class="caveat"><b>Pending:</b> the AMF/EMF genus-level breakdown (Rhizophagus,
-Funneliformis, Diversispora, Cortinarius, Inocybe, …) will be added once the custom Kaiju
-classification of all 39 samples completes. The database build is finishing now.</div>
+<p>SSU screening (phyloFlash/SILVA) detects eukaryotic and plant signal in every sample
+(confirming root/fungal material), but cannot resolve arbuscular (AMF) or ectomycorrhizal
+(EMF) fungi below Opisthokonta, and sylph genome-containment finds no AMF/EMF (too
+low-coverage in bulk shotgun).</p>
+{amf_html}
 
 <h2>Plain-language notes on the statistics</h2>
 <p class="muted">A reader's guide to why the headline is framed as a hypothesis — written for
@@ -329,7 +383,12 @@ for both.</p>
 dereplicated 32-genome AMF database; taxonomic tables via <code>sylph-tax</code>.
 Independent 16S: V4 515F/806R EMP amplicons, QIIME 2 2026.4 + DADA2 1.38 + Greengenes2
 2024.09 / SILVA 138.1 (328 samples, 34,594 ASVs); phylum (L2) relative abundances compared
-to the WGS profile. Statistics on genus/phylum relative abundances: Mann–Whitney U (taxa) with
+to the WGS profile. Protein-level classification of all 39 metagenomes against a cleaned
+nr_euk database with <code>Kaiju</code> (MEM) and <code>DIAMOND</code> 2.2.1 (double-indexed,
+<code>-f102</code> LCA; 5M-read subsample per sample concatenated into one search), plus a
+custom Kaiju fungal DB (nr_euk-fungi + 32 AMF genomes + EMF references) for the AMF/EMF
+breakdown; the nr_euk database build required stripping internal <code>*</code> separators
+from the source FASTA. Statistics on genus/phylum relative abundances: Mann–Whitney U (taxa) with
 Benjamini–Hochberg FDR (q-values) and Cliff's δ effect sizes; PERMANOVA &amp; PERMDISP on
 Bray–Curtis distances (999 permutations). {stats.get('n_samples','36')}/39 shotgun samples
 processed — 3 (2 CTRL, 1 Site1) initially failed sylph sketching because of corrupted reads
@@ -338,8 +397,8 @@ recovered with <code>seqkit sana</code> + re-pairing before re-profiling. Timepo
 measures of the same plots; p-values treat samples as independent and are thus
 anticonservative, so taxon claims are anchored on effect size and cross-assay reproduction
 rather than p alone. Figures and tables reproducible from
-<code>/mnt/disk4/timo/gbi/analysis/</code> and
-<code>/mnt/disk4/timo/gbi/amplicon/reanalysis_2026/</code>.</p>
+<code>/mnt/disk4/timo/gbi/b2/analysis/</code> and
+<code>/mnt/disk4/timo/gbi/b2/amplicon/reanalysis_2026/</code>.</p>
 
 <p class="muted">Companion WGS + amplicon analysis extending the Biosphere 2 WALD drought
 manuscript · last updated automatically from the GBI metagenomics pipeline.</p>

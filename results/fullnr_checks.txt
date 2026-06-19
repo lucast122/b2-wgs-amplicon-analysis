@@ -1,0 +1,8 @@
+OK	n_samples == 39
+OK	genera detected > 100
+OK	relabund rows ~100%
+OK	Nitrospira detected
+OK	drought table written
+OK	figure written
+n_significant_q05	171
+Nitrospira: pre=3.52% drought=2.99% (log2FC=-0.23)

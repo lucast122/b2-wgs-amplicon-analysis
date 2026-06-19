@@ -12,7 +12,7 @@ Analyses:
      -> direct test of the paper's "convergence" hypothesis
   5. Bacteria:Fungi and phylum-level shifts pre-drought -> drought
 
-Outputs to /mnt/disk4/timo/gbi/analysis/figs and results/*.tsv
+Outputs to /mnt/disk4/timo/gbi/b2/analysis/figs and results/*.tsv
 """
 import os
 import numpy as np
@@ -25,7 +25,7 @@ from skbio.stats.distance import permanova, permdisp, DistanceMatrix
 from skbio.stats.ordination import pcoa
 from skbio.diversity import beta_diversity
 
-A = "/mnt/disk4/timo/gbi/analysis"
+A = "/mnt/disk4/timo/gbi/b2/analysis"
 FIG = f"{A}/figs"; RES = f"{A}/results"
 os.makedirs(FIG, exist_ok=True); os.makedirs(RES, exist_ok=True)
 

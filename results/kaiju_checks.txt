@@ -1,0 +1,7 @@
+OK	n_samples_parsed
+OK	AMF detected (Rhizophagus)
+OK	EMF detected
+OK	fungalnorm sums sane (<=100.1)
+OK	domain fractions row ~100
+OK	figure 12 written
+OK	excel written

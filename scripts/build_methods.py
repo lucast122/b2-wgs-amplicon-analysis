@@ -3,7 +3,7 @@
 site, linked from the main report (index.html). Pulls a few live numbers from
 results/ so it stays in sync. Self-contained styling matching the report."""
 import os, pandas as pd
-A = "/mnt/disk4/timo/gbi/analysis"; RES = f"{A}/results"
+A = "/mnt/disk4/timo/gbi/b2/analysis"; RES = f"{A}/results"
 OUT = f"{A}/GBI_methods.html"
 
 def stat(d, k, default="—"):

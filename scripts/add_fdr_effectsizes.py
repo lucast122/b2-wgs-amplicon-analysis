@@ -11,7 +11,7 @@ Rewrites each TSV with the new columns appended. Safe to re-run.
 """
 import numpy as np, pandas as pd, os
 
-A = "/mnt/disk4/timo/gbi/analysis"; RES = f"{A}/results"
+A = "/mnt/disk4/timo/gbi/b2/analysis"; RES = f"{A}/results"
 meta = pd.read_csv(f"{A}/metadata.tsv", sep="\t", index_col=0)
 PRE  = set(meta.index[meta.condition == "pre-drought"])
 DRO  = set(meta.index[meta.condition == "drought"])

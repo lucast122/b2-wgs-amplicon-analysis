@@ -3,7 +3,7 @@
 Parse sylph .sylphmpa taxonomic profiles for all 39 GBI Biosphere 2 drought
 samples into tidy abundance matrices, merged with the experimental design map.
 
-Outputs (to /mnt/disk4/timo/gbi/analysis/):
+Outputs (to /mnt/disk4/timo/gbi/b2/analysis/):
   - phylum_relabund.tsv   : samples x phylum  (relative abundance %)
   - genus_relabund.tsv    : samples x genus
   - class_relabund.tsv    : samples x class
@@ -13,9 +13,9 @@ Outputs (to /mnt/disk4/timo/gbi/analysis/):
 import os, glob, re
 import pandas as pd
 
-TAXPROF = "/mnt/disk4/timo/gbi/sylph_output/taxprof"
-DESIGN  = "/mnt/disk4/timo/gbi/sylph_output/sample_design_map.tsv"
-OUT     = "/mnt/disk4/timo/gbi/analysis"
+TAXPROF = "/mnt/disk4/timo/gbi/b2/sylph_output/taxprof"
+DESIGN  = "/mnt/disk4/timo/gbi/b2/sylph_output/sample_design_map.tsv"
+OUT     = "/mnt/disk4/timo/gbi/b2/analysis"
 os.makedirs(OUT, exist_ok=True)
 
 # ---- metadata -------------------------------------------------------------

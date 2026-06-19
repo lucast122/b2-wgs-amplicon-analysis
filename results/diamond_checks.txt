@@ -1,0 +1,10 @@
+OK	n_samples == 39
+OK	genera > 100
+OK	relabund rows ~100%
+OK	kaiju cross-check ran
+OK	median Spearman > 0.5
+OK	Nitrospira detected
+OK	figure written
+median_spearman_vs_kaiju	0.8727
+top15_overlap	0.667
+Nitrospira (diamond): pre=5.61% drought=4.71% (log2FC=-0.25)
