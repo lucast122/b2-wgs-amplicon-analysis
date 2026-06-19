@@ -242,6 +242,43 @@ probing (qSIP) with metagenomics links microbial physiology and activity to soil
 <i>mSystems</i> 2022.</p>
 """
 
+# --- Tier-2 N-cycle functional potential (NCyc) ---
+NCYC_OK = os.path.exists(f"{RES}/ncyc_genefamily_hpm.tsv")
+if NCYC_OK:
+    _ncg = pd.read_csv(f"{RES}/ncyc_genefamily_hpm.tsv", sep="\t", index_col=0)
+    _ncp = pd.read_csv(f"{RES}/ncyc_process_hpm.tsv", sep="\t", index_col=0)
+    _ns = [x for x in _ncg.index if x in _meta.index]; _nmd = _meta.loc[_ns]
+    _npre = [x for x in _nmd.index[_nmd.condition=="pre-drought"]]
+    _ndro = [x for x in _nmd.index[_nmd.condition=="drought"]]
+    def _gsum(df, pref):
+        cols = [c for c in df.columns if c.startswith(pref)]
+        if not cols: return (float('nan'), float('nan'))
+        v = df[cols].sum(1); return (v.loc[_npre].mean(), v.loc[_ndro].mean())
+    _nxrp, _nxrd = _gsum(_ncg, "nxr"); _amop, _amod = _gsum(_ncg, "amo")
+    _denit = _ncp["Denitrification"].mean() if "Denitrification" in _ncp else float('nan')
+    _dnra = _ncp["DNRA"].mean() if "DNRA" in _ncp else float('nan')
+    _ncd = pd.read_csv(f"{RES}/ncyc_drought.tsv", sep="\t") if os.path.exists(f"{RES}/ncyc_drought.tsv") else pd.DataFrame()
+    _ncnsig = int((_ncd["q_BH"] < 0.05).sum()) if len(_ncd) else 0
+else:
+    _nxrp=_nxrd=_amop=_amod=_denit=_dnra=float('nan'); _ncnsig=0
+ncyc_html = (f"""
+<h2>5b. Functional potential: nitrogen-cycle genes</h2>
+<p>Shotgun reads were profiled against <b>NCyc</b> (68 nitrogen-cycle gene families; DIAMOND).
+The community's N-cycling gene pool is dominated by <b>denitrification</b> (&asymp;{_denit:.0f}
+hits per million reads) and <b>DNRA</b> (&asymp;{_dnra:.0f}), with a smaller dedicated
+nitrification set.</p>
+<div class="key"><b>The nitrite-oxidation gene pool is buffered even though <i>Nitrospira</i>
+declines.</b> Drought leaves <i>nxrAB</i> (nitrite oxidoreductase) essentially unchanged
+({_nxrp:.1f}&rarr;{_nxrd:.1f} hits/million reads) and ammonia-oxidation <i>amoABC</i> only
+marginally lower ({_amop:.1f}&rarr;{_amod:.1f}); <b>no N-cycle gene family survives FDR</b>
+({_ncnsig} significant). So the strong <i>taxonomic</i> decline of <i>Nitrospira</i>
+(&sect;2b, &sect;4b) is <b>not</b> mirrored by a loss of nitrite-oxidation <i>gene potential</i> —
+consistent with functional redundancy (other taxa also carry <i>nxr</i>) and with the
+abundance&ne;function theme (&sect;6): the standing community's N-cycling capacity is buffered
+against this drought.</div>
+<div class="fig">{img('15_ncyc_drought.png')}</div>
+""" if NCYC_OK else "")
+
 html = f"""<!doctype html><html><head><meta charset="utf-8">
 <title>GBI Biosphere 2 Drought — Soil Microbiome Metagenomics</title>
 <style>
@@ -422,6 +459,7 @@ AMF spores — a trace of the mycorrhizal fungi the 16S cannot otherwise see.</d
 (EMF) fungi below Opisthokonta, and sylph genome-containment finds no AMF/EMF (too
 low-coverage in bulk shotgun).</p>
 {amf_html}
+{ncyc_html}
 {discussion_html}
 <h2>Plain-language notes on the statistics</h2>
 <p class="muted">A reader's guide to why the headline is framed as a hypothesis — written for

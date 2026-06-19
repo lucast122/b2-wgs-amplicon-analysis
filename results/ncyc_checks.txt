@@ -1,0 +1,8 @@
+OK	n_samples >= 36
+OK	gene families detected > 20
+OK	nxr detected
+OK	nitrification process present
+OK	drought tables written
+OK	figure written
+nxrAB (nitrite oxidation, Nitrospira): pre=16.5 drought=16.4 HPM (log2FC=-0.01, Cliff d=-0.07)
+n_families_signif_q05	1

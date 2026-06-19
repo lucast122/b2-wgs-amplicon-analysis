@@ -72,14 +72,16 @@ fig, ax = plt.subplots(figsize=(6.8, 4))
 x = np.arange(len(show)); w = 0.38
 ax.bar(x - w/2, show["pre_mean"], w, label="pre-drought", color="#1f77b4")
 ax.bar(x + w/2, show["drought_mean"], w, label="drought", color="#d62728")
+ymax = float(max(show["pre_mean"].max(), show["drought_mean"].max()))
+ax.set_ylim(0, ymax * 1.22)                      # headroom so p-labels clear the top border
 for i, (_, r) in enumerate(show.iterrows()):
     star = "*" if (pd.notna(r.MWU_p) and r.MWU_p < 0.05) else ""
-    ax.text(i, max(r.pre_mean, r.drought_mean)+0.3,
+    ax.text(i, max(r.pre_mean, r.drought_mean) + ymax * 0.03,
             f"p={r.MWU_p:.2g}{star}" if pd.notna(r.MWU_p) else "", ha="center", fontsize=7)
 ax.set_xticks(x); ax.set_xticklabels(show["label"], rotation=35, ha="right", fontsize=8)
 ax.set_ylabel("mean relative abundance (%)")
 ax.set_title(f"16S amplicon drought response\n({len(pre_ids)} pre vs {len(dro_ids)} drought, GG2; * p<0.05)")
-ax.legend(frameon=False)
+ax.legend(frameon=False, loc="upper left")
 plt.tight_layout(); plt.savefig(f"{FIG}/06_amplicon_drought.png", dpi=130); plt.close()
 
 # ---- concordance note: direction agreement with WGS ----

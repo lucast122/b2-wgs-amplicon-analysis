@@ -49,14 +49,16 @@ fig, ax = plt.subplots(figsize=(6, 4))
 x = np.arange(len(show)); w = 0.38
 ax.bar(x - w/2, show["pre"], w, label="pre-drought", color="#1f77b4")
 ax.bar(x + w/2, show["drought"], w, label="drought", color="#d62728")
+ymax = float(max(show["pre"].max(), show["drought"].max()))
+ax.set_ylim(0, ymax * 1.22)                      # headroom so p-labels clear the top border
 for i, (_, r) in enumerate(show.iterrows()):
     star = "*" if r["p"] < 0.05 else ""
-    ax.text(i, max(r["pre"], r["drought"]) + 0.2, f"p={r['p']:.2g}{star}",
+    ax.text(i, max(r["pre"], r["drought"]) + ymax * 0.03, f"p={r['p']:.2g}{star}",
             ha="center", fontsize=7)
 ax.set_xticks(x); ax.set_xticklabels(show["phylum"], rotation=35, ha="right", fontsize=8)
 ax.set_ylabel("mean relative abundance (%)")
 ax.set_title("Phylum-level drought response (* p<0.05)")
-ax.legend(frameon=False)
+ax.legend(frameon=False, loc="upper left")
 plt.tight_layout(); plt.savefig(f"{FIG}/05_drought_response.png", dpi=130); plt.close()
 print("Wrote 04_composition.png, 05_drought_response.png")
 print("\nMean composition (%):")
