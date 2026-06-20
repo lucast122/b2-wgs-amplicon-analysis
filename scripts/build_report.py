@@ -127,20 +127,15 @@ _dov = int(round(float(dchk.get("top15_overlap", "0")) * 15))
 _dnp, _dnd = _nit_means("diamond_genus_relabund.tsv")
 _knp, _knd = _nit_means("fullnr_genus_relabund.tsv")
 protein_html = f"""
-<h3>4b. Protein-level cross-validation: two aligners, one answer</h3>
-<p>The shotgun reads were independently re-classified at the protein level with <b>Kaiju</b>
-(maximum-exact-match) and <b>DIAMOND</b> (double-indexed alignment, <code>-f102</code> LCA)
-against the <i>same</i> cleaned nr_euk protein database &mdash; so any difference reflects the
-aligner, not the reference. The two give <b>highly concordant community profiles</b> (median
-per-sample Spearman &rho;={_dspear:.2f}; {_dov}/15 top genera shared) and rank the same
-nitrogen-cycling / rhizosphere taxa as dominant (<i>Bradyrhizobium, Nitrospira, Luteitalea,
-Mesorhizobium</i>).</p>
-<div class="key"><b><i>Nitrospira</i> declines under drought in every method.</b> The nitrite
-oxidiser drops pre&rarr;drought in DIAMOND ({_dnp:.1f}&rarr;{_dnd:.1f}% of classified reads),
-in Kaiju ({_knp:.1f}&rarr;{_knd:.1f}%), in sylph genome-containment, and in the 328-sample 16S
-survey &mdash; <b>four independent assays, same direction.</b> A pattern reproduced across
-genome-containment and two protein aligners is the strongest evidence in this study, even
-though it still does not survive the pseudoreplication-corrected test (&sect;3b).</div>
+<h3>4b. Protein-level cross-validation (Kaiju + DIAMOND)</h3>
+<p>Two protein aligners classified the reads against the same nr_euk database. They agree closely
+(median per-sample Spearman &rho;={_dspear:.2f}; {_dov}/15 top genera shared) and identify the same
+dominant taxa — the nitrogen-cyclers and rhizosphere bacteria <i>Bradyrhizobium</i>,
+<i>Nitrospira</i>, <i>Luteitalea</i> and <i>Mesorhizobium</i>. Both record the drought decline in
+<i>Nitrospira</i> (DIAMOND {_dnp:.1f}&rarr;{_dnd:.1f}%, Kaiju {_knp:.1f}&rarr;{_knd:.1f}% of
+classified reads). The decline therefore holds across all four methods applied here — sylph,
+Kaiju, DIAMOND and 16S — the most reproducible result in the dataset, though still short of
+significance after correction for pseudoreplication (&sect;3b).</p>
 <div class="fig">{img('14_diamond_vs_kaiju.png')}</div>
 """ if DIA_OK else ""
 
@@ -195,7 +190,7 @@ that buffered axis (standing DNA) and agrees with it: no taxon survives correcti
 structure are unchanged, and all fungal guilds are flat (total fungi
 {_fpre:.1f}&rarr;{_fdro:.1f}% of reads). Read-abundance is simply blind to the isotope-allocation
 axis where the companion signal sits.</div>
-<div class="key"><b>Take-aways</b>
+<div class="key">
 <ul>
 <li><b>Abundance &ne; activity — both methods show it.</b> ¹³C–PLFA tracks <i>carbon flux into
 active lipid synthesis</i> (hours–days); shotgun reads and PLFA mol&percnt; both track <i>standing
@@ -321,22 +316,22 @@ code{{background:#f0f0f0;padding:1px 4px;border-radius:3px;font-size:.88em}}
 </style></head><body>
 
 <h1>Soil microbiome response to drought in the Biosphere 2 tropical rainforest</h1>
-<p class="muted">This analysis extends our Biosphere 2 WALD ¹³CO₂ drought study with
-shotgun-metagenomic and 16S-amplicon profiling of the soil microbiome — adding a
-taxonomic "who is present" axis to the ¹³C carbon-flux measurements in the manuscript.
-Shotgun profiling with sylph (GTDB r232 + FungiRefSeq + custom AMF database);
-{stats.get('n_samples','36')} samples passing QC across pre-drought and drought conditions.</p>
-<p style="margin-top:-4px"><a href="methods.html"><b>📋 Read the detailed methods &rarr;</b></a>
-<span class="muted">(separate page — samples, databases, the Kaiju build, and full statistics)</span></p>
+<p class="muted">Shotgun-metagenomic and 16S-amplicon profiling of the soil microbiome from the
+Biosphere 2 WALD ¹³CO₂ drought experiment — the standing-community counterpart to the ¹³C–PLFA
+carbon-flux study (Bai et&nbsp;al.). {stats.get('n_samples','36')} metagenomes across pre-drought
+and drought; taxonomic profiling with sylph, Kaiju and DIAMOND, functional profiling with NCyc
+and dbCAN. <a href="methods.html">Detailed methods &rarr;</a></p>
 
-<div class="key"><b>Headline:</b> At n={stats.get('n_samples','36')}, no taxon survives
-multiple-testing correction and overall diversity/structure is unchanged — <b>no
-statistically significant drought shift</b>. The strongest pattern, by converging evidence
-rather than any single p-value, is suppression of nitrite-oxidising <b><i>Nitrospira</i></b>
-(large effect, consistent phylum→genus→strain, echoed in the 328-sample 16S survey), with a
-drought-tolerant <b>Actinomycetota</b> rise. We report these as <i>hypotheses</i>, not
-established effects. <b>Key caveat:</b> pre-drought samples are from September and drought
-from November, so condition is confounded with sampling date/season (§3b).</div>
+<div class="key"><b>Summary.</b> The standing soil community is compositionally stable across the
+drought: no taxon survives multiple-testing correction and α- and β-diversity are unchanged. The
+most consistent shift is a decline in the nitrite-oxidiser <b><i>Nitrospira</i></b>, reproduced
+from phylum to strain and across four independent methods (sylph, Kaiju, DIAMOND, 16S), with a
+parallel decline in the N-fixer <i>Bradyrhizobium</i> and an increase in <i>Actinomycetota</i>.
+This signal does not reach significance once pseudoreplication is accounted for, and condition is
+confounded with season (pre-drought = September, drought = November). Functional gene potential
+(N-cycling, CAZymes) is likewise unchanged. Together this indicates the drought response is a
+re-routing of carbon <i>allocation</i> to fungal partners (companion ¹³C study) rather than a
+turnover of the standing community or its gene repertoire.</div>
 
 <h2>1. Community composition</h2>
 <p>The soil is bacteria-dominated (~95%), with a substantial ammonia-oxidising archaeal
@@ -360,11 +355,9 @@ to {shift.loc[shift.phylum=='Nitrospirota','drought_mean'].values[0]:.1f}%
 (q≈{shift.loc[shift.phylum=='Nitrospirota','q_BH'].values[0]:.2f}). The phylum table is
 suggestive only; the N-cycling signal rests on cross-rank and cross-assay consistency
 (below), not these p-values.</div>
-<div class="key"><b>Why this matters:</b> Actinomycetota are textbook drought-tolerant soil
-bacteria (thick peptidoglycan walls, sporulation, osmolyte accumulation). Their relative
-increase is an independent confirmation that the drought treatment imposed real water
-stress on the soil community. The Nitrospirota decline points to drought-suppressed
-nitrification — a functionally meaningful change in N-cycling.</div>
+<p>Actinomycetota are characteristically drought-tolerant (thick peptidoglycan walls,
+sporulation, osmolyte accumulation), so their relative increase indicates the treatment imposed
+real water stress on the community; the Nitrospirota decline points to suppressed nitrification.</p>
 <div class="fig">{img('05_drought_response.png')}</div>
 
 <h3>2b. Genus level sharpens this into a nitrogen-cycling signal</h3>
@@ -377,10 +370,10 @@ decline, a direct hit to nitrification. Alongside it the nitrogen-fixer / legume
 symbiont <b><i>Bradyrhizobium</i></b> falls ({g_brady['pre']:.2f}→{g_brady['drought']:.2f}%,
 p={g_brady['p']:.3f}), while the methylotroph <i>Methyloceanibacter</i> rises
 ({g_methylo['pre']:.1f}→{g_methylo['drought']:.1f}%, p={g_methylo['p']:.3f}).</p>
-<div class="key"><b>Coherent N-cycle suppression:</b> drought reduces both nitrite-oxidation
-(<i>Nitrospira</i>) and nitrogen-fixation (<i>Bradyrhizobium</i>) — two complementary
-nitrogen-cycle functions moving down together. The <i>Bradyrhizobium</i> signal is notable
-given the belowground role of the legume <i>C. fairchildiana</i> in the manuscript.</div>
+<div class="key">Both nitrite-oxidation (<i>Nitrospira</i>) and nitrogen-fixation
+(<i>Bradyrhizobium</i>) decline together — a coherent suppression of two complementary N-cycle
+functions. The <i>Bradyrhizobium</i> decline is notable given the belowground role of the legume
+<i>C. fairchildiana</i> in the companion ¹³C study.</div>
 <div class="fig">{img('08_genus_drought.png')}</div>
 <div class="caveat"><b>Why phylum leads the report:</b> of 70 testable genera, 44 are
 uninterpretable GTDB placeholder codes (e.g. <code>DATFRX01</code>), and the
@@ -487,33 +480,18 @@ low-coverage in bulk shotgun).</p>
 {ncyc_html}
 {cazy_html}
 {discussion_html}
-<h2>Plain-language notes on the statistics</h2>
-<p class="muted">A reader's guide to why the headline is framed as a hypothesis — written for
-non-statisticians (e.g. for manuscript text).</p>
+<h2>Statistical considerations</h2>
 <div class="key" style="font-size:.93em">
-<p><b>Repeated timepoints = pseudoreplication.</b> Each plot was sampled at 0/6/48 h, and the
-standing community does not turn over in that window — so a plot's three timepoints are
-essentially three copies of one community, not three independent samples. Treating them as
-independent is like measuring one patient's blood pressure three times and analysing it as
-three patients: it makes results look more certain than they are. We corrected for this with a
-mixed model (plot as a random effect) and by collapsing each plot to one value; both removed
-the apparent significance.</p>
-<p><b>Effect size (Cliff's δ) = how big, not just whether.</b> A p-value says only "could this
-be chance?"; it says nothing about magnitude. Cliff's δ asks: pick a random drought and a
-random pre-drought sample — how often is one higher? 0 = total overlap, ±1 = complete
-separation. <i>Nitrospira</i>'s δ ≈ −0.63 ("large") means drought samples are almost always
-lower — a strong, consistent shift even though it is not formally significant.</p>
-<p><b>Power = could we even have detected it?</b> Power is the chance of catching a real effect
-if one exists; small studies are a coarse net that only catches the biggest fish. At
-n = {pwr.get('n_pre','?')} vs {pwr.get('n_drought','?')} we can only reliably detect very large
-effects (Cohen's d ≈ {_pwrd}), so "no significant shift" means "none detectable at this sample
-size", <i>not</i> "no shift". A large effect that is
-non-significant in an underpowered study is the signature of a real signal we were too small to
-prove — hence we report it as a hypothesis.</p>
-<p><b>Multiple testing (BH-FDR).</b> Testing many taxa at once guarantees some will look
-significant by chance; the false-discovery-rate correction (q-values) adjusts for that. It is a
-separate issue from the non-independence above — both inflate false positives, and we control
-for both.</p>
+<p>Four points underlie reporting the <i>Nitrospira</i> shift as a hypothesis rather than an
+established effect. <b>Pseudoreplication:</b> the 0/6/48 h timepoints are repeated measures of the
+same plots, not independent samples; a plot random-effect mixed model and a plot-collapsed test
+both remove the nominal significance (§3b). <b>Multiple testing:</b> with Benjamini–Hochberg FDR
+across taxa, no taxon reaches q&lt;0.05. <b>Effect size:</b> nonetheless <i>Nitrospira</i>'s
+Cliff's δ ≈ −0.63 is large (drought samples are almost always lower), so the direction is
+consistent even where it is not significant. <b>Power:</b> at n = {pwr.get('n_pre','?')} vs
+{pwr.get('n_drought','?')} only very large effects (Cohen's d ≈ {_pwrd}) are detectable, so a
+non-significant result here means "not detectable at this sample size", not "no effect". The
+signal is therefore anchored on effect size and cross-method reproduction rather than p-values.</p>
 </div>
 
 <h2>Methods (brief) — <a href="methods.html">full detailed methods &rarr;</a></h2>
