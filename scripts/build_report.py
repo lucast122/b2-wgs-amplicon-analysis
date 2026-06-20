@@ -487,8 +487,8 @@ established effect. <b>Pseudoreplication:</b> the 0/6/48 h timepoints are repeat
 same plots, not independent samples; a plot random-effect mixed model and a plot-collapsed test
 both remove the nominal significance (§3b). <b>Multiple testing:</b> with Benjamini–Hochberg FDR
 across taxa, no taxon reaches q&lt;0.05. <b>Effect size:</b> nonetheless <i>Nitrospira</i>'s
-Cliff's δ ≈ −0.63 is large (drought samples are almost always lower), so the direction is
-consistent even where it is not significant. <b>Power:</b> at n = {pwr.get('n_pre','?')} vs
+Cliff's δ ≈ {g_nitro['cliffs_delta']:.2f} is large (drought samples are almost always lower), so
+the direction is consistent even where it is not significant. <b>Power:</b> at n = {pwr.get('n_pre','?')} vs
 {pwr.get('n_drought','?')} only very large effects (Cohen's d ≈ {_pwrd}) are detectable, so a
 non-significant result here means "not detectable at this sample size", not "no effect". The
 signal is therefore anchored on effect size and cross-method reproduction rather than p-values.</p>
