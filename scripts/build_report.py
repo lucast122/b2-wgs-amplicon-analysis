@@ -217,6 +217,16 @@ tree-species-resolved; our shotgun set is neither, and carries a Sept-vs-Nov sea
 (&sect;3b) — so it cannot resolve the topsoil-vs-subsoil or species-specific effects (e.g. the
 <i>C. fairchildiana</i> subsoil-AMF flux) that carry the signal.</li>
 </ul>
+<p><b>Both findings are consistent with the wider literature.</b> The <i>Nitrospira</i> decline
+matches Séneca et&nbsp;al.<sup>[5]</sup>, who found comammox <i>Nitrospira</i> <i>amoA</i> (gene
+and transcript) dropped significantly under experimental soil drought while bulk nitrification
+rate was maintained by ammonia-oxidising bacteria — the same nitrite-oxidiser sensitivity and
+functional compensation we see (taxonomic decline, buffered <i>nxr</i> potential). More broadly,
+the decoupling of a perturbation-sensitive taxonomy from a stable functional gene pool is the
+expected signature of <b>functional redundancy</b> in soil, repeatedly reported in global soil
+metagenomics<sup>[6]</sup> and reviews of microbial resistance/resilience to climate
+extremes<sup>[7]</sup>. Our result therefore places the B2 rainforest soil within the common
+"compositionally responsive, functionally buffered" regime.</p>
 <b>Bottom line:</b> the metagenome and the ¹³C–PLFA study are <b>concordant where they overlap</b>
 (a compositionally buffered standing community) and <b>complementary where they do not</b> (¹³C
 carbon allocation). &ldquo;No abundance shift&rdquo; does not refute &ldquo;more carbon to
@@ -234,7 +244,15 @@ re-routes soil microbial carbon metabolism towards emission of volatile metaboli
 artificial tropical rainforest.</a> <i>Nat. Microbiol.</i> 2023, 8:1480. &nbsp;
 [4] <a href="https://journals.asm.org/doi/10.1128/msystems.00417-22">Quantitative stable-isotope
 probing (qSIP) with metagenomics links microbial physiology and activity to soil moisture.</a>
-<i>mSystems</i> 2022.</p>
+<i>mSystems</i> 2022. &nbsp;
+[5] <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7784676/">Séneca et&nbsp;al. Composition and
+activity of nitrifier communities in soil are strongly affected by drought.</a> <i>ISME J.</i>
+2020, 14:3038. &nbsp;
+[6] <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9108720/">Functional redundancy in soil
+microbial community based on metagenomics across the globe.</a> 2022. &nbsp;
+[7] <a href="https://royalsocietypublishing.org/doi/10.1098/rstb.2019.0112">Soil microbial
+community responses to climate extremes: resistance, resilience and transitions to alternative
+states.</a> <i>Phil. Trans. R. Soc. B</i> 2020.</p>
 """
 
 # --- Tier-2 N-cycle functional potential (NCyc) ---
@@ -298,6 +316,22 @@ AA {_aap:.0f}&rarr;{_aad:.0f} hits/million reads) and <b>no CAZy class or family
 the standing pool of carbohydrate-degrading or nitrogen-cycling genes.</p>
 <div class="fig">{img('16_cazy_classes.png')}</div>
 """ if CAZY_OK else "")
+
+# --- Tier-2 osmolyte / compatible-solute gene potential ---
+_ock = _kv("osmolyte_checks.txt")
+OSM_OK = os.path.exists(f"{RES}/osmolyte_checks.txt")
+_otp = float(_ock.get("total_pre","nan")); _otd = float(_ock.get("total_drought","nan"))
+_otpv = float(_ock.get("total_p","nan")); _onsig = int(float(_ock.get("n_pathway_signif_q05","0")))
+osmolyte_html = (f"""
+<p><b>Osmolyte / compatible-solute genes.</b> Because the companion study's central plant
+response is investment in osmolytes, we asked whether soil microbes show the analogous signal —
+enrichment of compatible-solute biosynthesis genes (trehalose, ectoine, glycine-betaine,
+glucosylglycerol, mannitol; curated UniProt set). They do not: total osmotic-stress gene
+potential is unchanged ({_otp:.0f}&rarr;{_otd:.0f} hits/million reads, p={_otpv:.2f}; {_onsig}/6
+pathways significant). The microbial drought response, if any, is therefore not encoded in a
+shift of <i>genomic</i> osmolyte potential — pointing to regulation at the transcript/metabolite
+level (which DNA cannot resolve), unlike the plants' standing osmolyte investment.</p>
+""" if OSM_OK else "")
 
 html = f"""<!doctype html><html><head><meta charset="utf-8">
 <title>GBI Biosphere 2 Drought — Soil Microbiome Metagenomics</title>
@@ -479,6 +513,11 @@ low-coverage in bulk shotgun).</p>
 {amf_html}
 {ncyc_html}
 {cazy_html}
+{osmolyte_html}
+<div class="key" style="text-align:center"><b>Synthesis — one axis moves, the rest are buffered.</b>
+Across taxonomy, N-cycle, carbohydrate-active and osmolyte genes, only the taxonomic decline of
+nitrite-oxidisers reaches a non-trivial effect size; functional gene potential is flat.</div>
+<div class="fig">{img('17_buffering_overview.png')}</div>
 {discussion_html}
 <h2>Statistical considerations</h2>
 <div class="key" style="font-size:.93em">

@@ -1,0 +1,6 @@
+n_samples	36
+pathways	6
+total_pre	1556.50
+total_drought	1552.75
+total_p	0.7038
+n_pathway_signif_q05	0

@@ -94,12 +94,13 @@ slide(f"""<h2>5 · Mycorrhizal fungi recovered (custom Kaiju fungal DB)</h2>
 symbionts central to the manuscript's belowground carbon story, which SSU surveys and
 genome-containment miss. No AMF/EMF genus shifts significantly.</p>""")
 
-# 8 functional
-slide(f"""<h2>6 · Functional gene potential is buffered too</h2>
-<div class="row">{img('15_ncyc_drought.png','50vh')}{img('16_cazy_classes.png','50vh')}</div>
-<p class="cap">Nitrite-oxidation genes (<i>nxr</i>) are flat <b>despite</b> the <i>Nitrospira</i>
-decline (functional redundancy); carbohydrate-degradation (CAZy GH/AA) is flat too. Neither the
-N-cycling nor the C-degrading repertoire turns over.</p>""")
+# 8 functional — synthesis
+slide(f"""<h2>6 · One axis moves, the rest are buffered</h2>
+<div class="fig">{img('17_buffering_overview.png','60vh')}</div>
+<p class="cap">Drought effect size (Cliff's δ) across all data types. Only the taxonomic decline of
+nitrite-oxidisers is non-trivial; <b>N-cycle, carbohydrate-active and osmolyte gene potential are
+flat</b> (functional redundancy). Matches Séneca et&nbsp;al. (2020): comammox <i>Nitrospira</i>
+declines under drought while nitrification function is maintained.</p>""")
 
 # 9 reconciliation
 slide(f"""<h2>7 · Reconciling with the ¹³C–PLFA study</h2>
