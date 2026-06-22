@@ -1,0 +1,6 @@
+OK	6 groups paired
+OK	AMF 13C-activity up
+OK	Actino 13C-activity down but abundance up (decoupled)
+OK	figure written
+spearman_activity_vs_abundance	-0.543
+spearman_p	0.266

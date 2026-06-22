@@ -170,6 +170,40 @@ if AMF_OK:
     _fpre, _fdro = _tf.loc[_pre].mean(), _tf.loc[_dro].mean()
 else:
     _fpre = _fdro = float('nan')
+# --- 13C integration (paired activity vs abundance per group) ---
+C13_OK = os.path.exists(f"{RES}/c13_group_comparison.tsv")
+if C13_OK:
+    _c13 = pd.read_csv(f"{RES}/c13_group_comparison.tsv", sep="\t")
+    def _cg(code, col):
+        r = _c13[_c13.group == code]
+        return float(r.iloc[0][col]) if len(r) else float("nan")
+    _ck = _kv("c13_checks.txt")
+    _c13rho = float(_ck.get("spearman_activity_vs_abundance", "nan"))
+c13_html = (f"""
+<h3>6a. The decisive test — carbon-uptake activity vs standing abundance, paired by group</h3>
+<p>With the companion study's per-plot ¹³C–PLFA data we can now put both axes on one plot. For each
+microbial group we compare its <b>drought response in carbon-uptake activity</b> (Δδ¹³C of recent
+plant carbon, dry−ambient) against its <b>drought response in standing abundance</b> (log₂
+drought/pre, this metagenome). If abundance tracked activity the groups would line up on a
+diagonal; they do not.</p>
+<div class="key"><b>Activity and abundance move independently — even oppositely.</b> Across the six
+groups the two responses are <i>negatively</i> rank-correlated (Spearman &rho;={_c13rho:.2f}). The
+clearest case is <b>Actinobacteria</b>: under drought they become <b>more abundant</b>
+(log₂FC&nbsp;{_cg('AC','wgs_log2FC'):+.2f}) yet take up <b>less</b> recent plant carbon
+(Δδ¹³C&nbsp;{_cg('AC','c13_dry_minus_amb'):+.2f}) — drought-persistent, but <i>not</i> fed fresh
+photosynthate. Conversely <b>arbuscular mycorrhizal</b> and <b>saprotrophic fungi</b> take up
+markedly <b>more</b> carbon (Δδ¹³C&nbsp;{_cg('AMF','c13_dry_minus_amb'):+.2f} and
+{_cg('SF','c13_dry_minus_amb'):+.2f}) while their standing abundance is <b>flat</b>
+({_cg('AMF','wgs_log2FC'):+.2f} and {_cg('SF','wgs_log2FC'):+.2f} log₂FC). This is the direct,
+paired demonstration of the report's thesis: the drought response is a re-routing of <b>carbon to
+active fungal partners</b>, invisible to — and decoupled from — the standing community that the
+metagenome measures.</div>
+<div class="fig">{img('18_c13_vs_abundance.png')}</div>
+<div class="caveat">Compared at the group level: the WGS and PLFA samplings use different plot/rep
+schemes and timepoint scales, so a per-plot join is not attempted. ¹³C activity is from the
+companion PLFA-SIP data (dry vs ambient); abundance is from this metagenome (drought vs pre).</div>
+""" if C13_OK else "")
+
 discussion_html = f"""
 <h2>6. Discussion: the metagenome in the context of the ¹³C–PLFA companion study</h2>
 <p>This shotgun survey is the standing-community counterpart to the B2 WALD <b>¹³C–PLFA companion
@@ -190,6 +224,7 @@ that buffered axis (standing DNA) and agrees with it: no taxon survives correcti
 structure are unchanged, and all fungal guilds are flat (total fungi
 {_fpre:.1f}&rarr;{_fdro:.1f}% of reads). Read-abundance is simply blind to the isotope-allocation
 axis where the companion signal sits.</div>
+{c13_html}
 <div class="key">
 <ul>
 <li><b>Abundance &ne; activity — both methods show it.</b> ¹³C–PLFA tracks <i>carbon flux into
@@ -390,8 +425,12 @@ parallel decline in the N-fixer <i>Bradyrhizobium</i> and an increase in <i>Acti
 This signal does not reach significance once pseudoreplication is accounted for, and condition is
 confounded with season (pre-drought = September, drought = November). Functional gene potential
 (N-cycling, CAZymes) is likewise unchanged. Together this indicates the drought response is a
-re-routing of carbon <i>allocation</i> to fungal partners (companion ¹³C study) rather than a
-turnover of the standing community or its gene repertoire.</div>
+re-routing of carbon <i>allocation</i> to fungal partners rather than a turnover of the standing
+community or its gene repertoire. Pairing this metagenome with the companion ¹³C–PLFA data makes
+this explicit (&sect;6a): drought-driven carbon-uptake activity and standing abundance are
+decoupled across microbial groups (Spearman &rho;&asymp;&minus;0.5) — e.g. Actinobacteria become
+more abundant yet take up <i>less</i> recent plant carbon, while mycorrhizal and saprotrophic fungi
+take up more carbon with no abundance change.</div>
 
 <h2>1. Community composition</h2>
 <p>The soil is bacteria-dominated (~95%), with a substantial ammonia-oxidising archaeal

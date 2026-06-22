@@ -1,0 +1,7 @@
+group	name	c13_dry_minus_amb	wgs_pre	wgs_drought	wgs_log2FC
+AC	Actinobacteria	-1.462	2.924	5.051	0.788
+AMF	Arbuscular mycorrhiza	2.251	6.392	6.373	-0.004
+GN	Gram-negative	1.394	65.019	62.738	-0.052
+GP	Gram-positive	0.725	2.972	5.15	0.793
+SF	Saprotrophic fungi	2.191	2.959	2.872	-0.043
+bac	Total bacteria	1.029	75.773	73.617	-0.042

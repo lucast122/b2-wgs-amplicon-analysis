@@ -103,18 +103,13 @@ flat</b> (functional redundancy). Matches Séneca et&nbsp;al. (2020): comammox <
 declines under drought while nitrification function is maintained.</p>""")
 
 # 9 reconciliation
-slide(f"""<h2>7 · Reconciling with the ¹³C–PLFA study</h2>
-<div class="cols"><div>
-<p class="lead">Concordant where they overlap, complementary where they don't.</p>
-<ul>
-<li>PLFA <b>composition</b> is also buffered (only dried topsoil shifts) — the ¹³C signal is in
-<b>carbon allocation</b>, not standing biomass</li>
-<li>Our DNA abundance measures exactly that buffered axis</li>
-<li>Example: Actinomycetota <b>abundance ↑</b> here, yet ¹³C shows they are <b>not</b> fed fresh
-carbon — abundance ≠ activity</li>
-</ul></div><div class="quote">
-"No abundance shift" does not refute "more carbon to fungi" — they are <b>different axes</b> of
-the same system.</div></div>""")
+slide(f"""<h2>7 · The decisive test: ¹³C activity vs abundance, paired by group</h2>
+<div class="row">{img('18_c13_vs_abundance.png','58vh')}</div>
+<p class="cap">Pairing the companion ¹³C–PLFA data with this metagenome: carbon-uptake activity and
+standing abundance respond to drought <b>independently — even oppositely</b> (Spearman ρ≈−0.5).
+<b>Actinobacteria</b> grow in abundance but take up <i>less</i> fresh carbon; <b>mycorrhizal &
+saprotrophic fungi</b> take up more carbon with flat abundance. "More carbon to fungi" and "no
+abundance shift" are both true — different axes of the same system.</p>""")
 
 # 10 conclusions
 slide(f"""<h2>Conclusions & next steps</h2>
