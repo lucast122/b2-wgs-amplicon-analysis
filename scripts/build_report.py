@@ -506,7 +506,7 @@ reproducible across two independent assays.</p></div>
 <div class="fig">{img('07_amplicon_vs_wgs.png')}</div>
 
 <p><b>Cross-method drought response.</b> Restricting the amplicon data to its own
-drought-labelled subset ({"%d pre vs %d drought" % (15, 20)}) and testing the two headline
+drought-labelled subset ({"%d pre vs %d drought" % (14, 20)}) and testing the two headline
 phyla, both move in the <b>same direction as the shotgun data</b>:</p>
 <table><tr><th>Phylum</th><th>shotgun (WGS)</th><th>16S amplicon</th><th>agreement</th></tr>
 <tr><td>Actinomycetota</td>
@@ -522,7 +522,7 @@ concordant — though not significant — in the smaller, non-paired amplicon su
 drought-tolerant Actinomycetota increase and the Nitrospirota (nitrifier) decline are thus
 the most robust signals, reproducing across two assays and two sample sets.</p>
 <div class="fig">{img('06_amplicon_drought.png')}</div>
-<div class="caveat"><b>Honest caveats:</b> the amplicon drought subset is small (n=15/20) and
+<div class="caveat"><b>Honest caveats:</b> the amplicon drought subset is small (n=14/20) and
 is <i>not</i> the same physical samples as the shotgun set, so cross-method agreement is at
 the level of biological signal, not paired replicates. The amplicon also flags its own
 shifts (Planctomycetota ▲ p=0.02, Bacteroidota ▼ p=0.03) not seen in the WGS — phylum-level

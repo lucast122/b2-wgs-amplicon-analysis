@@ -32,10 +32,13 @@ tab = tab * 100.0                              # to percent
 # ---- metadata ----
 md = pd.read_csv(META, sep="\t")
 md = md.rename(columns={"#SampleID": "sid"}).set_index("sid")
+# H307 (HR1RHC2-191101b) is labelled 'pre' but its embedded collection date is Nov 1 — i.e.
+# during the drought (Oct 8–Dec 2). Excluded as a mislabel/ambiguous boundary sample (sanity check).
+EXCLUDE = {"H307"}
 dro_ids = md.index[md["Drought"] == "drought"].tolist()
 pre_ids = md.index[md["Drought"] == "pre"].tolist()
-dro_ids = [s for s in dro_ids if s in tab.columns]
-pre_ids = [s for s in pre_ids if s in tab.columns]
+dro_ids = [s for s in dro_ids if s in tab.columns and s not in EXCLUDE]
+pre_ids = [s for s in pre_ids if s in tab.columns and s not in EXCLUDE]
 print(f"amplicon drought-labelled: {len(dro_ids)} drought, {len(pre_ids)} pre")
 
 # ---- test each phylum drought vs pre ----
