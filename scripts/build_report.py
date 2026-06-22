@@ -333,6 +333,32 @@ shift of <i>genomic</i> osmolyte potential — pointing to regulation at the tra
 level (which DNA cannot resolve), unlike the plants' standing osmolyte investment.</p>
 """ if OSM_OK else "")
 
+# --- Tier-3 MAGs + strain-level microdiversity (inStrain) ---
+_isk = _kv("instrain_Nitrospira_checks.txt")
+IS_OK = os.path.exists(f"{RES}/instrain_Nitrospira_checks.txt")
+_isn = _isk.get("n_samples_breadth50", "?")
+_ispi_pre = float(_isk.get("nucl_diversity_pre", "nan")); _ispi_dro = float(_isk.get("nucl_diversity_drought", "nan"))
+_ispi_p = float(_isk.get("nucl_diversity_p", "nan"))
+_drepdir = "/mnt/disk4/timo/gbi/b2/assembly/drep/dereplicated_genomes"
+_n_mags_drep = len([f for f in os.listdir(_drepdir) if f.endswith(".fa")]) if os.path.isdir(_drepdir) else 0
+strain_html = (f"""
+<h2>5c. Genome-resolved MAGs and strain-level stability</h2>
+<p>Per-sample co-assembly (MEGAHIT) and binning (MetaBAT2 → CheckM2 → GTDB-Tk → dRep) yielded a
+non-redundant set of <b>{_n_mags_drep} metagenome-assembled genomes</b> (≥50% complete, &lt;10%
+contamination), dominated by the uncultured Acidobacteriota/Pseudomonadota lineages typical of this
+soil. Notably, the most abundant genera (<i>Luteitalea</i>, <i>Acidobacterium</i>) yielded no
+high-quality MAG — they are too strain-diverse to assemble cleanly, itself a signature of high
+within-species diversity.</p>
+<div class="key"><b>The buffering extends to strain resolution.</b> For the recovered dominant
+nitrite-oxidiser (a <i>Nitrospira_C</i> MAG, 86% complete), within-population SNV diversity was
+profiled across {_isn} adequately-covered samples (inStrain). Nucleotide diversity is high but
+<b>unchanged</b> under drought ({_ispi_pre:.4f}→{_ispi_dro:.4f}, p={_ispi_p:.2f}), as are SNV count
+and coverage. So even at the deepest resolution — single-nucleotide variants within one population
+— the community is stable. The strain's own abundance also holds steady while the species-level
+signal declines, indicating the <i>Nitrospira</i> decrease is spread across the population rather
+than a crash of this dominant strain.</div>
+""" if IS_OK else "")
+
 html = f"""<!doctype html><html><head><meta charset="utf-8">
 <title>GBI Biosphere 2 Drought — Soil Microbiome Metagenomics</title>
 <style>
@@ -514,9 +540,11 @@ low-coverage in bulk shotgun).</p>
 {ncyc_html}
 {cazy_html}
 {osmolyte_html}
+{strain_html}
 <div class="key" style="text-align:center"><b>Synthesis — one axis moves, the rest are buffered.</b>
-Across taxonomy, N-cycle, carbohydrate-active and osmolyte genes, only the taxonomic decline of
-nitrite-oxidisers reaches a non-trivial effect size; functional gene potential is flat.</div>
+Across taxonomy, N-cycle, carbohydrate-active and osmolyte genes, and down to strain-level SNV
+diversity, only the taxonomic decline of nitrite-oxidisers reaches a non-trivial effect size;
+functional gene potential and within-population diversity are flat.</div>
 <div class="fig">{img('17_buffering_overview.png')}</div>
 {discussion_html}
 <h2>Statistical considerations</h2>

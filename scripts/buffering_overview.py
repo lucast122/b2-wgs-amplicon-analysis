@@ -37,13 +37,24 @@ add("AA ligninolytic (gene)", "CAZymes", grab("cazy_class_drought.tsv","feature"
 # Osmolyte genes
 add("Trehalose (gene)", "Osmolyte genes", grab("osmolyte_drought.tsv","pathway","Trehalose"))
 add("Glycine-betaine (gene)", "Osmolyte genes", grab("osmolyte_drought.tsv","pathway","Glycine-betaine"))
+# Strain level (inStrain microdiversity of the dominant Nitrospira MAG)
+def _ick(fn, key):
+    p = f"{RES}/{fn}"
+    if not os.path.exists(p): return None
+    for line in open(p):
+        if line.startswith(key + "\t"):
+            try: return float(line.split("\t")[1])
+            except Exception: return None
+    return None
+add("Nitrospira π (strain)", "Strain microdiversity", _ick("instrain_Nitrospira_checks.txt", "nucl_diversity_cliffs"))
+add("Nitrospira SNVs (strain)", "Strain microdiversity", _ick("instrain_Nitrospira_checks.txt", "SNV_count_cliffs"))
 
 if not rows:
     print("no data"); raise SystemExit
 
 df = pd.DataFrame(rows, columns=["label","cat","delta"])
-cats = ["Taxonomy","N-cycle genes","CAZymes","Osmolyte genes"]
-colors = {"Taxonomy":"#d62728","N-cycle genes":"#1f77b4","CAZymes":"#2ca02c","Osmolyte genes":"#9467bd"}
+cats = ["Taxonomy","N-cycle genes","CAZymes","Osmolyte genes","Strain microdiversity"]
+colors = {"Taxonomy":"#d62728","N-cycle genes":"#1f77b4","CAZymes":"#2ca02c","Osmolyte genes":"#9467bd","Strain microdiversity":"#8c564b"}
 df["cat"] = pd.Categorical(df["cat"], categories=cats, ordered=True)
 df = df.sort_values(["cat","delta"]).reset_index(drop=True)
 y = np.arange(len(df))[::-1]
