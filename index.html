@@ -269,21 +269,38 @@ does: carbohydrate-<i>degradation</i> transcripts fall and a biosynthesis/storag
 <table class="tbl"><tr><th style='text-align:left'>CAZy class (function)</th><th>WGS potential<br>log&#8322;FC</th>
 <th>MT expr.<br>pre&rarr;dro (HPM)</th><th>MT expr.<br>log&#8322;FC</th><th>Cliff&#39;s &delta;</th>
 <th>p<br>(uncorr.)</th><th>q<br>(BH)</th><th>p<br>(plot mixed)</th></tr><tr><td style='text-align:left'><b>PL</b> &darr; <span style='color:#666'>polysaccharide lyases (pectin)</span></td><td>-0.05</td><td>139&rarr;99</td><td style='color:#b1421f'><b>-0.50</b></td><td>-0.59</td><td>0.001</td><td>0.004</td><td>0.049</td></tr><tr><td style='text-align:left'><b>CE</b> &darr; <span style='color:#666'>carbohydrate esterases (de-acetylation)</span></td><td>-0.01</td><td>467&rarr;344</td><td style='color:#b1421f'><b>-0.44</b></td><td>-0.56</td><td>0.002</td><td>0.004</td><td>0.040</td></tr><tr><td style='text-align:left'><b>CBM</b> &darr; <span style='color:#666'>carbohydrate-binding modules (substrate targeting)</span></td><td>+0.01</td><td>1650&rarr;1321</td><td style='color:#b1421f'><b>-0.32</b></td><td>-0.57</td><td>0.002</td><td>0.004</td><td>0.155</td></tr><tr><td style='text-align:left'><b>AA</b> &darr; <span style='color:#666'>auxiliary redox (ligninolytic)</span></td><td>-0.03</td><td>375&rarr;319</td><td style='color:#555'><b>-0.24</b></td><td>-0.36</td><td>0.047</td><td>0.071</td><td>0.145</td></tr><tr><td style='text-align:left'><b>GH</b> &darr; <span style='color:#666'>glycoside hydrolases (polysaccharide degradation)</span></td><td>-0.02</td><td>4546&rarr;4271</td><td style='color:#555'><b>-0.09</b></td><td>-0.27</td><td>0.128</td><td>0.154</td><td>0.559</td></tr><tr><td style='text-align:left'><b>GT</b> &uarr; <span style='color:#666'>glycosyltransferases (biosynthesis)</span></td><td>-0.01</td><td>5483&rarr;6510</td><td style='color:#1a6b3a'><b>+0.25</b></td><td>+0.22</td><td>0.228</td><td>0.228</td><td>0.073</td></tr></table>
-<p style="font-size:.9em;color:#444"><b>Direction (expression):</b> down — pectin lyases (PL), de-acetylating
-esterases (CE), the carbohydrate-binding modules that anchor enzymes to cellulose/xylan (CBM) and ligninolytic
-redox enzymes (AA); up — glycosyltransferases (GT). At the family level the same split sharpens: broad
-plant-cell-wall and peptidoglycan degradation (PL1, CE11, AA5, GH23/24, many CBMs) is down, while
-<b>storage-glucan mobilisation and trehalose metabolism</b> (GH15 glucoamylase, CBM20 starch-binding,
-GH65 trehalose phosphorylase, GH3/GH176 &beta;-glucosidase) is up — the metabolic signature of cells
-throttling costly litter decomposition and switching to accessible carbon and trehalose osmoprotection.</p>
+<p>The shift reads as a move from a <b>decomposition/foraging</b> program to a <b>survival/maintenance</b> one,
+entirely at the transcript level (the gene complement is unchanged) — four coherent steps:</p>
+<ol style="font-size:.95em;line-height:1.5">
+<li><b>Extracellular breakdown of complex plant carbon is throttled.</b> Pectin lyases (PL, PL1),
+hemicellulose-de-acetylating esterases (CE, CE11), ligninolytic redox enzymes (AA, AA5) and the
+carbohydrate-binding modules (CBM) that physically dock these enzymes onto cellulose/xylan all fall. This is
+the costly secreted machinery that only pays off in moist soil, where water films let enzyme and substrate
+meet; as the soil dries those films retract, diffusion collapses, and secreting exoenzymes stops being worth
+the investment.</li>
+<li><b>Microbial cell-wall turnover drops too.</b> The peptidoglycan-degrading lysozymes / lytic
+transglycosylases (GH23, GH24) are among the most strongly down — less recycling of microbial necromass and
+less lytic activity on neighbours, consistent with a community moving from growth toward maintenance.</li>
+<li><b>The cell mobilises its own reserves.</b> Glucoamylase (GH15) and starch-binding modules (CBM20) rise
+while glycogen synthase (GT3) falls — stored glucan is being <i>spent</i>, not built — and &beta;-glucosidases
+(GH3, GH176) finish simple oligosaccharides to glucose.</li>
+<li><b>That glucose is routed into protection.</b> Trehalose/maltose phosphorylase (GH65) sits at the
+carbon&ndash;osmolyte junction, and the osmolyte panel below shows trehalose and mannitol synthesis up. The net
+biosynthetic glycosyltransferase (GT) increase is consistent with building protective cell-envelope / EPS
+glycans, though that part is only directional. Net effect: carbon is pulled out of decomposition and growth and
+into osmotic protection and cell maintenance.</li>
+</ol>
 <table class="tbl"><tr><th style='text-align:left'>Top family (function)</th><th>log&#8322;FC</th>
 <th>Cliff&#39;s &delta;</th><th>p</th><th>q (BH)</th><th>dir</th></tr><tr><td style='text-align:left'><b>GT3</b> <span style='color:#666'>glycogen synthase</span></td><td style='color:#b1421f'><b>-1.86</b></td><td>-0.88</td><td>0.000</td><td>0.001</td><td>down</td></tr><tr><td style='text-align:left'><b>GH24</b> <span style='color:#666'>lysozyme (peptidoglycan)</span></td><td style='color:#b1421f'><b>-1.30</b></td><td>-0.78</td><td>0.000</td><td>0.006</td><td>down</td></tr><tr><td style='text-align:left'><b>PL1</b> <span style='color:#666'>pectate lyase (pectin)</span></td><td style='color:#b1421f'><b>-0.70</b></td><td>-0.69</td><td>0.000</td><td>0.011</td><td>down</td></tr><tr><td style='text-align:left'><b>CE11</b> <span style='color:#666'>GlcNAc deacetylase</span></td><td style='color:#b1421f'><b>-0.97</b></td><td>-0.70</td><td>0.000</td><td>0.011</td><td>down</td></tr><tr><td style='text-align:left'><b>AA5</b> <span style='color:#666'>copper-radical oxidase</span></td><td style='color:#b1421f'><b>-0.64</b></td><td>-0.58</td><td>0.001</td><td>0.041</td><td>down</td></tr><tr><td style='text-align:left'><b>CBM13</b> <span style='color:#666'>xylan/cellulose binding</span></td><td style='color:#b1421f'><b>-0.67</b></td><td>-0.67</td><td>0.000</td><td>0.014</td><td>down</td></tr><tr><td style='text-align:left'><b>GH23</b> <span style='color:#666'>lytic transglycosylase</span></td><td style='color:#b1421f'><b>-0.62</b></td><td>-0.57</td><td>0.002</td><td>0.045</td><td>down</td></tr><tr><td style='text-align:left'><b>GH15</b> <span style='color:#666'>glucoamylase (starch&rarr;glucose)</span></td><td style='color:#1a6b3a'><b>+0.72</b></td><td>+0.57</td><td>0.002</td><td>0.045</td><td>up</td></tr><tr><td style='text-align:left'><b>GH176</b> <span style='color:#666'>&beta;-glucosidase</span></td><td style='color:#1a6b3a'><b>+0.96</b></td><td>+0.61</td><td>0.001</td><td>0.029</td><td>up</td></tr><tr><td style='text-align:left'><b>GH65</b> <span style='color:#666'>trehalose/maltose phosphorylase</span></td><td style='color:#1a6b3a'><b>+0.55</b></td><td>+0.32</td><td>0.073</td><td>0.504</td><td>up</td></tr></table>
-<div class="key"><b>Implication for the soil.</b> Because the standing community holds its full
-carbohydrate-degrading gene complement (WGS potential flat) but down-regulates its transcription, this is a
-<b>reversible transcriptional reallocation, not a loss of capacity</b> — a brake on decomposition / C
-mineralisation during dry-down, with decomposer machinery held in reserve for rewetting. The buffering thesis
-(abundance, diversity, potential, strain all stable) thus meets its complement on the <i>activity</i> axis,
-consistent with the &sup1;&sup3;C carbon-allocation result (&sect;6a).</div>
+<div class="key"><b>Implication for the soil.</b> Under drought the community shifts its carbon metabolism
+from <b>decomposition/foraging to survival/maintenance</b> without changing its gene complement (WGS potential
+flat). Because the decomposer machinery is switched off transcriptionally rather than lost, this is a
+<b>reversible re-allocation</b>: a transient brake on litter/SOM decomposition and carbon mineralisation during
+the dry-down — with full degradative capacity held in reserve for rewetting — while carbon is redirected into
+compatible-solute synthesis and maintenance. This is the <i>activity</i>-axis complement to the buffering seen
+at every standing level (abundance, diversity, gene potential, strain), and it mirrors the &sup1;&sup3;C/PLFA
+companion result: plants and microbes both pulling carbon back from growth into osmotic protection
+(&sect;6a).</div>
 
 <h3 style="margin-top:18px">Compatible-solute (osmolyte) expression — a significant, pathway-specific response</h3>
 <p>The same logic applied to the curated osmolyte/compatible-solute set (trehalose, ectoine,
