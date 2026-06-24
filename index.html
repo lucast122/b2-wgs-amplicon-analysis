@@ -317,6 +317,33 @@ independently corroborates the CAZy result above (GH65 trehalose phosphorylase, 
 experimental-unit level</b> — the osmolyte reallocation is the most robust transcriptional drought response
 we detect. Genomic osmolyte <i>potential</i> is flat throughout (&sect;5b), so this is purely regulatory.</p>
 
+<h3 style="margin-top:18px">Which taxa drive it — a copiotroph&ndash;oligotroph division of labour</h3>
+<p><b>How.</b> To ask <i>who</i> performs each shift we attributed every transcript to a taxon: we took the
+reads that hit a CAZy or osmolyte gene (32.2 M reads), classified them against the nr&nbsp;euk protein database
+with Kaiju (25.4 M, 79%, assigned to phylum/genus), and re-ran the drought contrast per taxon &mdash; both the
+sample-level test and the plot-level mixed model. Read-based taxonomy of ~150&nbsp;bp transcripts is reliable to
+<b>phylum and usually genus</b> (true species calls are not, so we report genus as the finest trustworthy
+level).</p>
+<table class="tbl"><tr><th style='text-align:left'>Response</th><th style='text-align:left'>Phylum</th>
+<th>pre&rarr;dro (HPM)</th><th>log&#8322;FC</th><th>Cliff&#39;s &delta;</th><th>q (BH)</th><th>q (plot mixed)</th></tr><tr><td style='text-align:left'>Trehalose &uarr;</td><td style='text-align:left'><b>Actinomycetota</b> *</td><td>2.8&rarr;10.6</td><td style='color:#1a6b3a'><b>+1.92</b></td><td>+0.89</td><td>0.000</td><td>0.000</td></tr><tr><td style='text-align:left'>Trehalose &uarr;</td><td style='text-align:left'><b>Planctomycetota</b> *</td><td>2.1&rarr;4.5</td><td style='color:#1a6b3a'><b>+1.08</b></td><td>+0.60</td><td>0.007</td><td>0.000</td></tr><tr><td style='text-align:left'>Mannitol &uarr; (fungi)</td><td style='text-align:left'><b>Ascomycota</b></td><td>0.1&rarr;0.8</td><td style='color:#1a6b3a'><b>+3.10</b></td><td>+0.64</td><td>0.004</td><td>0.052</td></tr><tr><td style='text-align:left'>Biosynthesis GT &uarr;</td><td style='text-align:left'><b>Actinomycetota</b> *</td><td>180.8&rarr;626.6</td><td style='color:#1a6b3a'><b>+1.79</b></td><td>+0.90</td><td>0.000</td><td>0.000</td></tr><tr><td style='text-align:left'>Biosynthesis GT &uarr; (fungi)</td><td style='text-align:left'><b>Ascomycota</b> *</td><td>33.3&rarr;289.2</td><td style='color:#1a6b3a'><b>+3.12</b></td><td>+0.82</td><td>0.000</td><td>0.038</td></tr><tr><td style='text-align:left'>Degradation &darr;</td><td style='text-align:left'><b>Bacteroidota</b> *</td><td>320.9&rarr;142.0</td><td style='color:#b1421f'><b>-1.18</b></td><td>-0.74</td><td>0.001</td><td>0.000</td></tr><tr><td style='text-align:left'>Degradation &darr;</td><td style='text-align:left'><b>Pseudomonadota</b> *</td><td>1667.9&rarr;1125.8</td><td style='color:#b1421f'><b>-0.57</b></td><td>-0.50</td><td>0.022</td><td>0.021</td></tr><tr><td style='text-align:left'>Degradation &darr;</td><td style='text-align:left'><b>Acidobacteriota</b></td><td>564.0&rarr;376.5</td><td style='color:#b1421f'><b>-0.58</b></td><td>-0.55</td><td>0.013</td><td>0.112</td></tr><tr><td style='text-align:left'>Degradation &darr;</td><td style='text-align:left'><b>Myxococcota</b> *</td><td>159.8&rarr;93.5</td><td style='color:#b1421f'><b>-0.77</b></td><td>-0.66</td><td>0.003</td><td>0.012</td></tr><tr><td style='text-align:left'>Degradation &darr;</td><td style='text-align:left'><b>Verrucomicrobiota</b></td><td>177.0&rarr;130.0</td><td style='color:#b1421f'><b>-0.45</b></td><td>-0.54</td><td>0.014</td><td>0.170</td></tr></table>
+<p style="font-size:.9em;color:#444">* significant in the plot-level mixed model after FDR. The response is
+<b>taxonomically partitioned</b>. Osmoprotection is carried by stress-tolerant, oligotrophic lineages:
+<b>Actinomycetota</b> up-regulate trehalose synthesis (genera <i>Nocardioides</i>, <i>Streptomyces</i>,
+<i>Sporichthya</i>, <i>Solirubrobacter</i>) and protective biosynthetic glycosyltransferases, while <b>fungi
+(Ascomycota</b>, chiefly <i>Fusarium</i>) up-regulate mannitol, their signature compatible solute. The
+carbohydrate-<b>degradation shutdown is carried by the fast-growing, copiotrophic Gram-negatives</b> &mdash;
+Bacteroidota (steepest; genera <i>Flavobacterium</i>, <i>Chryseolinea</i>), Pseudomonadota
+(<i>Pseudomonas</i>, <i>Aeromonas</i>, <i>Thauera</i>, <i>Variovorax</i>), Acidobacteriota, Myxococcota and
+Verrucomicrobiota.</p>
+<div class="key"><b>What it means.</b> The drought response is a classic <b>copiotroph&rarr;oligotroph
+life-strategy shift</b>, here resolved transcriptionally: the copiotrophs that drive decomposition throttle
+their carbohydrate-active machinery, while the stress-tolerant Actinobacteria (and fungi) invest carbon in
+osmotic protection. This closes the loop with the rest of the study for Actinomycetota specifically &mdash;
+their standing abundance <i>holds/rises</i> under drought (WGS, 16S), their uptake of recent plant carbon is
+<i>down</i> (&sup1;&sup3;C, &sect;6a), and their transcription pivots to <i>trehalose and protective-glycan
+synthesis</i>: a coherent &ldquo;hunker-down&rdquo; strategy of staying put, not feeding, and protecting the
+cell.</div>
+
 <div class="caveat"><b>Statistical honesty.</b> All <i>q</i> values in the CAZy tables come from a
 <b>sample-level</b> test (n=43) that treats the 0/6/48&nbsp;h timepoints as independent replicates — i.e.
 <b>pseudoreplication</b> (only 7 plots are true experimental units). For the <b>CAZy classes the direction is
@@ -326,6 +353,18 @@ FDR</b> (min q&#8776;0.15). The <b>osmolyte response is stronger</b>: trehalose 
 <b>remain significant in the same mixed model after FDR</b> (q=0.03 and q=0.015), so that conclusion does not
 rest on pseudoreplication. We report the CAZy shift as a coherent directional reallocation and the
 trehalose/mannitol osmolyte up-regulation as a robust transcriptional drought response.</div>
+<div class="key" style="border-left-color:#2b6cb0"><b>Metatranscriptome — overall take-away.</b> At the DNA level the
+community is buffered on every axis (abundance, diversity, gene potential, strain; &sect;1&ndash;5c). The
+metatranscriptome shows where the drought response actually lives: it is <b>regulatory and activity-level, not
+structural</b>. Three convergent signals: <b>(1)</b> carbon metabolism is re-allocated from decomposition/foraging
+toward survival/maintenance — degradation transcripts down, storage-mobilisation and biosynthesis up;
+<b>(2)</b> compatible-solute production is re-routed toward the desiccation protectants <b>trehalose and
+mannitol</b> (the only drought signal that is FDR-significant at the experimental-unit level, and the direct
+microbial parallel to the plants' osmolyte investment); <b>(3)</b> the response is <b>taxonomically partitioned</b>
+along the copiotroph&ndash;oligotroph axis — stress-tolerant <b>Actinobacteria and fungi</b> invest in
+osmoprotection while fast-growing Gram-negative copiotrophs shut decomposition down. The standing community is
+held in reserve; what changes under drought is what it is <i>doing</i> with carbon — coherent with the
+&sup1;&sup3;C carbon-allocation result and the &ldquo;hunker-down&rdquo; strategy of the dominant Actinobacteria.</div>
 
 
 <h2>5c. Genome-resolved MAGs and strain-level stability</h2>
