@@ -1,0 +1,7 @@
+pathway	wgs_log2FC_potential	wgs_q	mt_log2FC_expression	mt_q
+Ectoine	0.0152	0.8164	0.3172	0.7795
+Glucosylglycerol	0.0416	0.7226	-0.1647	0.1769
+Glycine-betaine	-0.0093	0.8164	-0.3252	0.0663
+Mannitol	0.1836	0.8164	2.3829	0.0014
+Solute transport	-0.0182	0.7226	-0.1779	0.075
+Trehalose	0.0075	0.8245	0.6144	0.0432
